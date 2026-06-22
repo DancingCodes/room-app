@@ -1,5 +1,6 @@
 package love.moonc.room.ui.auth
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import love.moonc.room.di.AppContainer
 import love.moonc.room.data.model.User
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.ErrorText
+import love.moonc.room.ui.components.AvatarPicker
 import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
@@ -60,16 +63,25 @@ fun RegisterScreen(
     viewModel: AuthViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
     var account by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var avatarUrl by remember { mutableStateOf("") }
+    var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
     RoomScaffold(title = "注册", onBack = onBack) { modifier ->
         FormColumn(modifier.fillMaxSize()) {
-            FormTextField(avatarUrl, { avatarUrl = it }, "头像 URL")
+            AvatarPicker(
+                avatarUri = avatarUri,
+                avatarUrl = state.avatarUrl,
+                uploading = state.uploadingAvatar,
+                onAvatarSelected = { uri ->
+                    avatarUri = uri
+                    viewModel.uploadRegisterAvatar(context, uri)
+                },
+            )
             Row {
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
                 Spacer(Modifier.width(8.dp))
@@ -80,7 +92,7 @@ fun RegisterScreen(
             FormTextField(nickname, { nickname = it }, "昵称")
             FormTextField(password, { password = it }, "密码", password = true)
             PrimaryButton("注册", state.loading, {
-                viewModel.register(account, email, code, password, nickname, avatarUrl, onRegisterSuccess)
+                viewModel.register(account, email, code, password, nickname, state.avatarUrl, onRegisterSuccess)
             })
             ErrorText(state.message)
         }

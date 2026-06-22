@@ -1,5 +1,7 @@
 package love.moonc.room.ui.auth
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +11,7 @@ import kotlinx.coroutines.launch
 import love.moonc.room.core.network.requireData
 import love.moonc.room.core.network.requireSuccess
 import love.moonc.room.core.network.userMessage
+import love.moonc.room.core.file.toAvatarPart
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.EmailCodeRequest
 import love.moonc.room.data.model.LoginRequest
@@ -19,6 +22,8 @@ import love.moonc.room.data.storage.TokenStore
 
 data class AuthUiState(
     val loading: Boolean = false,
+    val uploadingAvatar: Boolean = false,
+    val avatarUrl: String = "",
     val message: String? = null,
 )
 
@@ -40,6 +45,26 @@ class AuthViewModel(
     fun sendRegisterCode(email: String) {
         launchAuth(successMessage = "验证码已发送") {
             api.sendRegisterCode(EmailCodeRequest(email.trim())).requireSuccess()
+        }
+    }
+
+    fun uploadRegisterAvatar(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(uploadingAvatar = true, message = null)
+            runCatching { api.uploadRegisterAvatar(uri.toAvatarPart(context)).requireData().avatarUrl }
+                .onSuccess { avatarUrl ->
+                    _uiState.value = _uiState.value.copy(
+                        uploadingAvatar = false,
+                        avatarUrl = avatarUrl,
+                        message = "头像已上传",
+                    )
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        uploadingAvatar = false,
+                        message = error.userMessage(),
+                    )
+                }
         }
     }
 
@@ -89,10 +114,14 @@ class AuthViewModel(
 
     private fun launchAuth(successMessage: String? = null, block: suspend () -> Unit) {
         viewModelScope.launch {
-            _uiState.value = AuthUiState(loading = true)
+            _uiState.value = _uiState.value.copy(loading = true, message = null)
             runCatching { block() }
-                .onSuccess { _uiState.value = AuthUiState(message = successMessage) }
-                .onFailure { error -> _uiState.value = AuthUiState(message = error.userMessage()) }
+                .onSuccess {
+                    _uiState.value = _uiState.value.copy(loading = false, message = successMessage)
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                }
         }
     }
 }

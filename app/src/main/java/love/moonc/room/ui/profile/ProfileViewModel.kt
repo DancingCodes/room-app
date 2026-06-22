@@ -1,5 +1,7 @@
 package love.moonc.room.ui.profile
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,12 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import love.moonc.room.core.network.requireData
 import love.moonc.room.core.network.userMessage
+import love.moonc.room.core.file.toAvatarPart
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.UpdateMeRequest
 import love.moonc.room.data.model.User
 
 data class ProfileUiState(
     val loading: Boolean = false,
+    val uploadingAvatar: Boolean = false,
     val user: User? = null,
     val message: String? = null,
 )
@@ -46,6 +50,23 @@ class ProfileViewModel(
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                }
+        }
+    }
+
+    fun updateAvatar(context: Context, uri: Uri, onSaved: (User) -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(uploadingAvatar = true, message = null)
+            runCatching { api.updateMyAvatar(uri.toAvatarPart(context)).requireData().user }
+                .onSuccess { user ->
+                    _uiState.value = ProfileUiState(user = user)
+                    onSaved(user)
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        uploadingAvatar = false,
+                        message = error.userMessage(),
+                    )
                 }
         }
     }

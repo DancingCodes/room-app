@@ -27,7 +27,11 @@ class RoomViewModelFactory(
             MainViewModel::class.java -> MainViewModel(appContainer.roomApi)
             ProfileViewModel::class.java -> ProfileViewModel(appContainer.roomApi)
             CreateRoomViewModel::class.java -> CreateRoomViewModel(appContainer.roomApi)
-            RoomDetailViewModel::class.java -> RoomDetailViewModel(appContainer.roomApi)
+            RoomDetailViewModel::class.java -> RoomDetailViewModel(
+                appContainer.roomApi,
+                appContainer.tokenStore,
+                appContainer.roomSocketFactory,
+            )
             else -> error("Unknown ViewModel class: ${modelClass.name}")
         } as T
     }

@@ -71,6 +71,12 @@ fun RoomDetailScreen(
         viewModel.load(roomId)
     }
 
+    LaunchedEffect(state.disconnected) {
+        if (state.disconnected) {
+            onLeft()
+        }
+    }
+
     RoomScaffold(
         title = detail?.room?.name ?: "房间详情",
         actions = {
@@ -127,6 +133,17 @@ fun RoomDetailScreen(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                if (state.hasOlderMessages) {
+                    item {
+                        Button(
+                            onClick = { viewModel.loadOlderMessages(roomId) },
+                            enabled = !state.loadingOlder,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(if (state.loadingOlder) "加载中" else "加载更早消息")
+                        }
+                    }
+                }
                 items(state.messages, key = { it.id }) { message ->
                     Text("${message.senderNickname}: ${message.content}")
                 }

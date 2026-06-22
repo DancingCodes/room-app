@@ -84,6 +84,7 @@ fun MainScreen(
                 modifier = Modifier.padding(padding),
                 state = state,
                 onRefresh = viewModel::refresh,
+                onLoadMore = viewModel::loadMoreRooms,
                 onJoinRoom = { roomId -> viewModel.joinRoom(roomId, onRoomClick) },
             )
         } else {
@@ -102,6 +103,7 @@ private fun HomeContent(
     modifier: Modifier,
     state: MainUiState,
     onRefresh: () -> Unit,
+    onLoadMore: () -> Unit,
     onJoinRoom: (Long) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
@@ -116,6 +118,17 @@ private fun HomeContent(
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 12.dp)) {
             items(state.rooms, key = { it.id }) { room ->
                 RoomItem(room = room, onJoinRoom = onJoinRoom)
+            }
+            if (state.hasMore) {
+                item {
+                    Button(
+                        onClick = onLoadMore,
+                        enabled = !state.loadingMore,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(if (state.loadingMore) "加载中" else "加载更多")
+                    }
+                }
             }
         }
     }
