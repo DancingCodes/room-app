@@ -50,7 +50,10 @@ class MainViewModel(
                     hasMore = roomPayload.page * roomPayload.pageSize < roomPayload.total,
                 )
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                _uiState.value = _uiState.value.copy(
+                    loading = false,
+                    message = _uiState.value.message ?: error.userMessage(),
+                )
             }
         }
     }
@@ -88,5 +91,9 @@ class MainViewModel(
                     _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
                 }
         }
+    }
+
+    fun showMessage(message: String) {
+        _uiState.value = _uiState.value.copy(message = message)
     }
 }

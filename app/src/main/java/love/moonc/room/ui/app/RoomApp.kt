@@ -7,6 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -33,6 +36,7 @@ fun RoomApp(
     appViewModel: AppViewModel = roomViewModel(appContainer),
 ) {
     val appState by appViewModel.uiState.collectAsState()
+    var homeMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(appState.targetRoute) {
         val target = appState.targetRoute ?: return@LaunchedEffect
@@ -84,6 +88,8 @@ fun RoomApp(
                 onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
                 onEditProfile = { navController.navigate(Routes.EditProfile) },
                 onLogout = { appViewModel.logout() },
+                externalMessage = homeMessage,
+                onExternalMessageShown = { homeMessage = null },
             )
         }
         composable(Routes.Home) {
@@ -93,6 +99,8 @@ fun RoomApp(
                 onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
                 onEditProfile = { navController.navigate(Routes.EditProfile) },
                 onLogout = { appViewModel.logout() },
+                externalMessage = homeMessage,
+                onExternalMessageShown = { homeMessage = null },
             )
         }
         composable(Routes.Me) {
@@ -127,7 +135,10 @@ fun RoomApp(
             RoomDetailScreen(
                 appContainer = appContainer,
                 roomId = roomId,
-                onLeft = { navController.navigate(Routes.Home) { popUpTo(0) } },
+                onLeft = { message ->
+                    homeMessage = message
+                    navController.navigate(Routes.Home) { popUpTo(0) }
+                },
             )
         }
     }

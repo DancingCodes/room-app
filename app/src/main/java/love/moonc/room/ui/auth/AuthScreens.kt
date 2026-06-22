@@ -1,11 +1,14 @@
 package love.moonc.room.ui.auth
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import love.moonc.room.di.AppContainer
 import love.moonc.room.data.model.User
 import love.moonc.room.ui.app.roomViewModel
+import love.moonc.room.ui.components.CenteredFormColumn
 import love.moonc.room.ui.components.ErrorText
 import love.moonc.room.ui.components.AvatarPicker
 import love.moonc.room.ui.components.FormColumn
@@ -40,12 +44,18 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     RoomScaffold(title = "Room") { modifier ->
-        FormColumn(modifier.fillMaxSize()) {
-            Text("轻量房间聊天")
+        CenteredFormColumn(modifier.fillMaxSize()) {
+            Spacer(Modifier.height(80.dp))
+            Text("Room", style = MaterialTheme.typography.headlineMedium)
+            Text("轻量房间聊天", style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(12.dp))
             FormTextField(account, { account = it }, "账号")
             FormTextField(password, { password = it }, "密码", password = true)
             PrimaryButton("登录", state.loading, { viewModel.login(account, password, onLoginSuccess) })
-            Row(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 TextButton(onClick = onRegisterClick) { Text("注册账号") }
                 Spacer(Modifier.width(16.dp))
                 TextButton(onClick = onResetPasswordClick) { Text("忘记密码") }
@@ -72,7 +82,7 @@ fun RegisterScreen(
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
     RoomScaffold(title = "注册", onBack = onBack) { modifier ->
-        FormColumn(modifier.fillMaxSize()) {
+        CenteredFormColumn(modifier.fillMaxSize()) {
             AvatarPicker(
                 avatarUri = avatarUri,
                 avatarUrl = state.avatarUrl,
@@ -82,9 +92,11 @@ fun RegisterScreen(
                     viewModel.uploadRegisterAvatar(context, uri)
                 },
             )
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
-                Spacer(Modifier.width(8.dp))
                 TextButton(onClick = { viewModel.sendRegisterCode(email) }) { Text("发验证码") }
             }
             FormTextField(code, { code = it }, "验证码")
@@ -112,10 +124,13 @@ fun ResetPasswordScreen(
     var password by remember { mutableStateOf("") }
 
     RoomScaffold(title = "找回密码", onBack = onBack) { modifier ->
-        FormColumn(modifier.fillMaxSize()) {
-            Row {
+        CenteredFormColumn(modifier.fillMaxSize()) {
+            Spacer(Modifier.height(80.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
-                Spacer(Modifier.width(8.dp))
                 TextButton(onClick = { viewModel.sendPasswordResetCode(email) }) { Text("发验证码") }
             }
             FormTextField(code, { code = it }, "验证码")

@@ -14,8 +14,8 @@ import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.AvatarPicker
+import love.moonc.room.ui.components.CenteredFormColumn
 import love.moonc.room.ui.components.ErrorText
-import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
 import love.moonc.room.ui.components.RoomScaffold
@@ -37,7 +37,7 @@ fun EditProfileScreen(
     }
 
     RoomScaffold(title = "编辑资料", onBack = onBack) { modifier ->
-        FormColumn(modifier = modifier) {
+        CenteredFormColumn(modifier = modifier) {
             AvatarPicker(
                 avatarUri = avatarUri,
                 avatarUrl = state.user?.avatarUrl,

@@ -13,6 +13,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 
 class AppContainer(context: Context) {
     val tokenStore: TokenStore = TokenStore(context.applicationContext)
@@ -22,6 +23,7 @@ class AppContainer(context: Context) {
     }
 
     val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .pingInterval(10, TimeUnit.SECONDS)
         .addInterceptor { chain ->
             val token = runBlocking { tokenStore.token.firstOrNull() }
             val request = if (token.isNullOrBlank()) {
