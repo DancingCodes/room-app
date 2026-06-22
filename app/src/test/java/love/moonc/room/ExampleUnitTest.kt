@@ -1,4 +1,4 @@
-package love.moonc.room_app
+package love.moonc.room
 
 import org.junit.Test
 

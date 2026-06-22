@@ -1,4 +1,4 @@
-package love.moonc.room_app.ui.theme
+package love.moonc.room.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

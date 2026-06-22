@@ -1,4 +1,4 @@
-package love.moonc.room_app.ui.theme
+package love.moonc.room.ui.theme
 
 import android.app.Activity
 import android.os.Build

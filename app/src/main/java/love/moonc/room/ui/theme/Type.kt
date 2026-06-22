@@ -1,4 +1,4 @@
-package love.moonc.room_app.ui.theme
+package love.moonc.room.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
