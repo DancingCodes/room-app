@@ -34,7 +34,7 @@ fun EditProfileScreen(
         state.user?.let { nickname = it.nickname }
     }
 
-    RoomScaffold(title = "编辑资料") { modifier ->
+    RoomScaffold(title = "") { modifier ->
         CenteredFormColumn(modifier = modifier) {
             AvatarPicker(
                 avatarUri = avatarUri,

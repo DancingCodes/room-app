@@ -226,6 +226,7 @@ private fun MeContent(
     val user = state.user
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (user == null) {
@@ -237,22 +238,54 @@ private fun MeContent(
             }
         } else {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onEditProfile() },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    ProfileAvatar(avatarUrl = user.avatarUrl)
                     Text(user.nickname, style = MaterialTheme.typography.titleLarge)
                     Text("邮箱  ${user.email}")
                 }
             }
         }
         Spacer(Modifier.height(4.dp))
-        Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) { Text("编辑资料") }
         TextButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("退出登录") }
+    }
+}
+
+@Composable
+private fun ProfileAvatar(avatarUrl: String?) {
+    Surface(
+        modifier = Modifier
+            .size(88.dp)
+            .clip(CircleShape),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        tonalElevation = 2.dp,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (!avatarUrl.isNullOrBlank()) {
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = "头像",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Icon(Icons.Filled.Person, contentDescription = "头像")
+            }
+        }
     }
 }
