@@ -262,7 +262,7 @@ private fun MeContent(
                 }
             }
         }
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.weight(1f))
         TextButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("退出登录") }
     }
 }

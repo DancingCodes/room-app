@@ -87,7 +87,13 @@ fun RoomApp(
             composable(Routes.EditProfile) {
                 EditProfileScreen(
                     appContainer = appContainer,
-                    onSaved = { user: User -> appViewModel.setUser(user) },
+                    onSaved = { user: User ->
+                        appViewModel.updateUser(user)
+                        navController.navigate(Routes.Me) {
+                            popUpTo(0)
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
             composable(Routes.CreateRoom) {

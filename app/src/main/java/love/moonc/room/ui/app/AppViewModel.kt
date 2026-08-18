@@ -56,6 +56,15 @@ class AppViewModel(
         }
     }
 
+    fun updateUser(user: User) {
+        _uiState.update {
+            it.copy(
+                isChecking = false,
+                user = user,
+            )
+        }
+    }
+
     fun clearNavigationTarget() {
         _uiState.update { it.copy(targetRoute = null) }
     }
