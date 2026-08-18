@@ -1,6 +1,7 @@
 package love.moonc.room.ui.profile
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,12 +24,15 @@ import love.moonc.room.ui.components.PrimaryButton
 fun EditProfileScreen(
     appContainer: AppContainer,
     onSaved: (User) -> Unit,
+    onBack: () -> Unit,
     viewModel: ProfileViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var nickname by remember { mutableStateOf("") }
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
+
+    BackHandler(onBack = onBack)
 
     LaunchedEffect(state.user?.id) {
         state.user?.let { nickname = it.nickname }

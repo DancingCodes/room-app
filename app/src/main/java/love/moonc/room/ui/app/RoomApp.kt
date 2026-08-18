@@ -85,15 +85,20 @@ fun RoomApp(
                 )
             }
             composable(Routes.EditProfile) {
+                fun navigateToMe() {
+                    navController.navigate(Routes.Me) {
+                        popUpTo(0)
+                        launchSingleTop = true
+                    }
+                }
+
                 EditProfileScreen(
                     appContainer = appContainer,
                     onSaved = { user: User ->
                         appViewModel.updateUser(user)
-                        navController.navigate(Routes.Me) {
-                            popUpTo(0)
-                            launchSingleTop = true
-                        }
+                        navigateToMe()
                     },
+                    onBack = { navigateToMe() },
                 )
             }
             composable(Routes.CreateRoom) {
