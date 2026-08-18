@@ -24,9 +24,7 @@ import love.moonc.room.di.AppContainer
 import love.moonc.room.data.model.User
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.CenteredFormColumn
-import love.moonc.room.ui.components.ErrorText
 import love.moonc.room.ui.components.AvatarPicker
-import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
 import love.moonc.room.ui.components.RoomScaffold
@@ -60,7 +58,6 @@ fun LoginScreen(
                 Spacer(Modifier.width(16.dp))
                 TextButton(onClick = onResetPasswordClick) { Text("忘记密码") }
             }
-            ErrorText(state.message)
         }
     }
 }
@@ -68,7 +65,6 @@ fun LoginScreen(
 @Composable
 fun RegisterScreen(
     appContainer: AppContainer,
-    onBack: () -> Unit,
     onRegisterSuccess: (User) -> Unit,
     viewModel: AuthViewModel = roomViewModel(appContainer),
 ) {
@@ -81,7 +77,7 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
-    RoomScaffold(title = "注册", onBack = onBack) { modifier ->
+    RoomScaffold(title = "注册") { modifier ->
         CenteredFormColumn(modifier.fillMaxSize()) {
             AvatarPicker(
                 avatarUri = avatarUri,
@@ -106,7 +102,6 @@ fun RegisterScreen(
             PrimaryButton("注册", state.loading, {
                 viewModel.register(account, email, code, password, nickname, state.avatarUrl, onRegisterSuccess)
             })
-            ErrorText(state.message)
         }
     }
 }
@@ -114,7 +109,6 @@ fun RegisterScreen(
 @Composable
 fun ResetPasswordScreen(
     appContainer: AppContainer,
-    onBack: () -> Unit,
     onResetSuccess: () -> Unit,
     viewModel: AuthViewModel = roomViewModel(appContainer),
 ) {
@@ -123,7 +117,7 @@ fun ResetPasswordScreen(
     var code by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    RoomScaffold(title = "找回密码", onBack = onBack) { modifier ->
+    RoomScaffold(title = "找回密码") { modifier ->
         CenteredFormColumn(modifier.fillMaxSize()) {
             Spacer(Modifier.height(80.dp))
             Row(
@@ -138,7 +132,6 @@ fun ResetPasswordScreen(
             PrimaryButton("重置密码", state.loading, {
                 viewModel.resetPassword(email, code, password, onResetSuccess)
             })
-            ErrorText(state.message)
         }
     }
 }

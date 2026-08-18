@@ -10,6 +10,7 @@ import love.moonc.room.core.network.userMessage
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.Room
 import love.moonc.room.data.model.User
+import love.moonc.room.ui.message.MessageCenter
 
 data class MainUiState(
     val loading: Boolean = false,
@@ -20,11 +21,11 @@ data class MainUiState(
     val pageSize: Int = 20,
     val total: Int = 0,
     val hasMore: Boolean = false,
-    val message: String? = null,
 )
 
 class MainViewModel(
     private val api: RoomApi,
+    private val messageCenter: MessageCenter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState
@@ -35,7 +36,7 @@ class MainViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, message = null)
+            _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
                 val roomPayload = api.rooms(page = 1, pageSize = _uiState.value.pageSize).requireData()
                 val user = api.me().requireData().user
@@ -50,10 +51,8 @@ class MainViewModel(
                     hasMore = roomPayload.page * roomPayload.pageSize < roomPayload.total,
                 )
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(
-                    loading = false,
-                    message = _uiState.value.message ?: error.userMessage(),
-                )
+                _uiState.value = _uiState.value.copy(loading = false)
+                messageCenter.show(error.userMessage())
             }
         }
     }
@@ -63,7 +62,7 @@ class MainViewModel(
         if (state.loading || state.loadingMore || !state.hasMore) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loadingMore = true, message = null)
+            _uiState.value = _uiState.value.copy(loadingMore = true)
             runCatching {
                 api.rooms(page = state.page + 1, pageSize = state.pageSize).requireData()
             }.onSuccess { roomPayload ->
@@ -77,23 +76,22 @@ class MainViewModel(
                     hasMore = roomPayload.page * roomPayload.pageSize < roomPayload.total,
                 )
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(loadingMore = false, message = error.userMessage())
+                _uiState.value = _uiState.value.copy(loadingMore = false)
+                messageCenter.show(error.userMessage())
             }
         }
     }
 
     fun joinRoom(roomId: Long, onJoined: (Long) -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, message = null)
+            _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.joinRoom(roomId).requireData() }
                 .onSuccess { detail -> onJoined(detail.room.id) }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                    _uiState.value = _uiState.value.copy(loading = false)
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
 
-    fun showMessage(message: String) {
-        _uiState.value = _uiState.value.copy(message = message)
-    }
 }

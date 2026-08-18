@@ -9,6 +9,7 @@ import love.moonc.room.core.network.NetworkConfig
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.storage.TokenStore
 import love.moonc.room.data.websocket.RoomSocketFactory
+import love.moonc.room.ui.message.MessageCenter
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit
 
 class AppContainer(context: Context) {
     val tokenStore: TokenStore = TokenStore(context.applicationContext)
+    val messageCenter: MessageCenter = MessageCenter()
 
     private val json = Json {
         ignoreUnknownKeys = true

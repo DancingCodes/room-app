@@ -13,16 +13,17 @@ import love.moonc.room.core.file.toAvatarPart
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.UpdateMeRequest
 import love.moonc.room.data.model.User
+import love.moonc.room.ui.message.MessageCenter
 
 data class ProfileUiState(
     val loading: Boolean = false,
     val uploadingAvatar: Boolean = false,
     val user: User? = null,
-    val message: String? = null,
 )
 
 class ProfileViewModel(
     private val api: RoomApi,
+    private val messageCenter: MessageCenter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
@@ -36,37 +37,39 @@ class ProfileViewModel(
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.me().requireData().user }
                 .onSuccess { user -> _uiState.value = ProfileUiState(user = user) }
-                .onFailure { error -> _uiState.value = ProfileUiState(message = error.userMessage()) }
+                .onFailure { error ->
+                    _uiState.value = ProfileUiState()
+                    messageCenter.show(error.userMessage())
+                }
         }
     }
 
     fun save(nickname: String, onSaved: (User) -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, message = null)
+            _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.updateMe(UpdateMeRequest(nickname.trim())).requireData().user }
                 .onSuccess { user ->
                     _uiState.value = ProfileUiState(user = user)
                     onSaved(user)
                 }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                    _uiState.value = _uiState.value.copy(loading = false)
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
 
     fun updateAvatar(context: Context, uri: Uri, onSaved: (User) -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(uploadingAvatar = true, message = null)
+            _uiState.value = _uiState.value.copy(uploadingAvatar = true)
             runCatching { api.updateMyAvatar(uri.toAvatarPart(context)).requireData().user }
                 .onSuccess { user ->
                     _uiState.value = ProfileUiState(user = user)
                     onSaved(user)
                 }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(
-                        uploadingAvatar = false,
-                        message = error.userMessage(),
-                    )
+                    _uiState.value = _uiState.value.copy(uploadingAvatar = false)
+                    messageCenter.show(error.userMessage())
                 }
         }
     }

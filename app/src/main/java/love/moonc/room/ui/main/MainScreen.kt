@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import love.moonc.room.di.AppContainer
 import love.moonc.room.data.model.Room
 import love.moonc.room.ui.app.roomViewModel
-import love.moonc.room.ui.components.ErrorText
 
 enum class MainTab {
     Home,
@@ -60,19 +58,10 @@ fun MainScreen(
     onRoomClick: (Long) -> Unit,
     onEditProfile: () -> Unit,
     onLogout: () -> Unit,
-    externalMessage: String? = null,
-    onExternalMessageShown: () -> Unit = {},
     viewModel: MainViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
     var tab by remember { mutableStateOf(initialTab) }
-
-    LaunchedEffect(externalMessage) {
-        if (!externalMessage.isNullOrBlank()) {
-            viewModel.showMessage(externalMessage)
-            onExternalMessageShown()
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -135,7 +124,6 @@ private fun HomeContent(
     onJoinRoom: (Long) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        ErrorText(state.message)
         if (state.rooms.isEmpty()) {
             EmptyRooms(
                 loading = state.loading,
@@ -271,6 +259,5 @@ private fun MeContent(
         Spacer(Modifier.height(4.dp))
         Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) { Text("编辑资料") }
         TextButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("退出登录") }
-        ErrorText(state.message)
     }
 }

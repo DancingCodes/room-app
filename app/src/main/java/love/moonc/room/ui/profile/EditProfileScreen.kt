@@ -15,7 +15,6 @@ import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.AvatarPicker
 import love.moonc.room.ui.components.CenteredFormColumn
-import love.moonc.room.ui.components.ErrorText
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
 import love.moonc.room.ui.components.RoomScaffold
@@ -23,7 +22,6 @@ import love.moonc.room.ui.components.RoomScaffold
 @Composable
 fun EditProfileScreen(
     appContainer: AppContainer,
-    onBack: () -> Unit,
     onSaved: (User) -> Unit,
     viewModel: ProfileViewModel = roomViewModel(appContainer),
 ) {
@@ -36,7 +34,7 @@ fun EditProfileScreen(
         state.user?.let { nickname = it.nickname }
     }
 
-    RoomScaffold(title = "编辑资料", onBack = onBack) { modifier ->
+    RoomScaffold(title = "编辑资料") { modifier ->
         CenteredFormColumn(modifier = modifier) {
             AvatarPicker(
                 avatarUri = avatarUri,
@@ -49,7 +47,6 @@ fun EditProfileScreen(
             )
             FormTextField(nickname, { nickname = it }, "昵称")
             PrimaryButton("保存", state.loading, { viewModel.save(nickname, onSaved) })
-            ErrorText(state.message)
         }
     }
 }

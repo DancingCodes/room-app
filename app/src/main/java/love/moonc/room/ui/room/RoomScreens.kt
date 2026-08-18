@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
-import love.moonc.room.ui.components.ErrorText
 import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.PrimaryButton
 import love.moonc.room.ui.components.RoomScaffold
@@ -39,13 +38,12 @@ import love.moonc.room.ui.components.RoomScaffold
 @Composable
 fun CreateRoomScreen(
     appContainer: AppContainer,
-    onBack: () -> Unit,
     onCreated: (Long) -> Unit,
     viewModel: CreateRoomViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    RoomScaffold(title = "创建房间", onBack = onBack) { modifier ->
+    RoomScaffold(title = "创建房间") { modifier ->
         FormColumn(modifier = modifier) {
             Text("房间人数", style = MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -61,7 +59,6 @@ fun CreateRoomScreen(
                 )
             }
             PrimaryButton("创建", state.loading, { viewModel.create(onCreated) })
-            ErrorText(state.message)
         }
     }
 }
@@ -105,7 +102,6 @@ fun RoomDetailScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(if (state.loading) "加载中" else "暂无房间信息")
-                        ErrorText(state.message)
                     }
                 }
                 return@Column
@@ -195,7 +191,6 @@ fun RoomDetailScreen(
                     Text("发送")
                 }
             }
-            ErrorText(state.message)
         }
     }
 }

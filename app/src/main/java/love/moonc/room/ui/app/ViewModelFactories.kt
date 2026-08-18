@@ -23,14 +23,15 @@ class RoomViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
             AppViewModel::class.java -> AppViewModel(appContainer.roomApi, appContainer.tokenStore)
-            AuthViewModel::class.java -> AuthViewModel(appContainer.roomApi, appContainer.tokenStore)
-            MainViewModel::class.java -> MainViewModel(appContainer.roomApi)
-            ProfileViewModel::class.java -> ProfileViewModel(appContainer.roomApi)
-            CreateRoomViewModel::class.java -> CreateRoomViewModel(appContainer.roomApi)
+            AuthViewModel::class.java -> AuthViewModel(appContainer.roomApi, appContainer.tokenStore, appContainer.messageCenter)
+            MainViewModel::class.java -> MainViewModel(appContainer.roomApi, appContainer.messageCenter)
+            ProfileViewModel::class.java -> ProfileViewModel(appContainer.roomApi, appContainer.messageCenter)
+            CreateRoomViewModel::class.java -> CreateRoomViewModel(appContainer.roomApi, appContainer.messageCenter)
             RoomDetailViewModel::class.java -> RoomDetailViewModel(
                 appContainer.roomApi,
                 appContainer.tokenStore,
                 appContainer.roomSocketFactory,
+                appContainer.messageCenter,
             )
             else -> error("Unknown ViewModel class: ${modelClass.name}")
         } as T

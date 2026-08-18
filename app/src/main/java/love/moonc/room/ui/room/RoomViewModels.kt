@@ -25,6 +25,7 @@ import love.moonc.room.data.model.SocketEvent
 import love.moonc.room.data.model.UpdateMicRequest
 import love.moonc.room.data.storage.TokenStore
 import love.moonc.room.data.websocket.RoomSocketFactory
+import love.moonc.room.ui.message.MessageCenter
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -32,11 +33,11 @@ import okhttp3.WebSocketListener
 data class CreateRoomUiState(
     val selectedMaxMembers: Int = 8,
     val loading: Boolean = false,
-    val message: String? = null,
 )
 
 class CreateRoomViewModel(
     private val api: RoomApi,
+    private val messageCenter: MessageCenter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateRoomUiState())
     val uiState: StateFlow<CreateRoomUiState> = _uiState
@@ -48,11 +49,12 @@ class CreateRoomViewModel(
     fun create(onCreated: (Long) -> Unit) {
         viewModelScope.launch {
             val maxMembers = _uiState.value.selectedMaxMembers
-            _uiState.value = _uiState.value.copy(loading = true, message = null)
+            _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.createRoom(CreateRoomRequest(maxMembers)).requireData() }
                 .onSuccess { detail -> onCreated(detail.room.id) }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                    _uiState.value = _uiState.value.copy(loading = false)
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
@@ -65,7 +67,6 @@ data class RoomDetailUiState(
     val messages: List<Message> = emptyList(),
     val hasOlderMessages: Boolean = false,
     val input: String = "",
-    val message: String? = null,
     val disconnected: Boolean = false,
 )
 
@@ -73,6 +74,7 @@ class RoomDetailViewModel(
     private val api: RoomApi,
     private val tokenStore: TokenStore,
     private val socketFactory: RoomSocketFactory,
+    private val messageCenter: MessageCenter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoomDetailUiState())
     val uiState: StateFlow<RoomDetailUiState> = _uiState
@@ -82,7 +84,7 @@ class RoomDetailViewModel(
 
     fun load(roomId: Long) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true, message = null)
+            _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
                 val detail = api.roomDetail(roomId).requireData()
                 val messages = api.messages(roomId, limit = messagePageSize).requireData().list
@@ -95,7 +97,8 @@ class RoomDetailViewModel(
                 )
                 connectSocket(roomId)
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(loading = false, message = error.userMessage())
+                _uiState.value = _uiState.value.copy(loading = false)
+                    messageCenter.show(error.userMessage())
             }
         }
     }
@@ -117,7 +120,7 @@ class RoomDetailViewModel(
                     )
                 }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(message = error.userMessage())
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
@@ -128,7 +131,7 @@ class RoomDetailViewModel(
         val beforeId = state.messages.minOfOrNull { it.id } ?: return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loadingOlder = true, message = null)
+            _uiState.value = _uiState.value.copy(loadingOlder = true)
             runCatching {
                 api.messages(roomId, limit = messagePageSize, beforeId = beforeId).requireData().list
             }.onSuccess { olderMessages ->
@@ -138,7 +141,8 @@ class RoomDetailViewModel(
                     hasOlderMessages = olderMessages.size >= messagePageSize,
                 )
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(loadingOlder = false, message = error.userMessage())
+                _uiState.value = _uiState.value.copy(loadingOlder = false)
+                messageCenter.show(error.userMessage())
             }
         }
     }
@@ -157,7 +161,7 @@ class RoomDetailViewModel(
                     )
                 }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(message = error.userMessage())
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
@@ -167,7 +171,7 @@ class RoomDetailViewModel(
             runCatching { api.leaveRoom(roomId).requireSuccess() }
                 .onSuccess { onLeft() }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(message = error.userMessage())
+                    messageCenter.show(error.userMessage())
                 }
         }
     }
@@ -279,10 +283,7 @@ class RoomDetailViewModel(
     }
 
     private fun handleSocketDisconnected() {
-        _uiState.value = _uiState.value.copy(
-            disconnected = true,
-            message = "连接已断开，已离开房间",
-        )
+        _uiState.value = _uiState.value.copy(disconnected = true)
     }
 
     override fun onCleared() {
