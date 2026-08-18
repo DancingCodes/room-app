@@ -182,32 +182,35 @@ private fun RoomItem(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
                 Text(
                     text = room.name,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = when {
-                        joining -> "进入中"
-                        isFull -> "满员"
-                        else -> "进入"
-                    },
-                    color = when {
-                        isFull -> MaterialTheme.colorScheme.error
-                        joining -> MaterialTheme.colorScheme.onSurfaceVariant
-                        else -> MaterialTheme.colorScheme.primary
-                    },
+                    text = "${room.currentMembers} / ${room.maxMembers} 人",
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
             Text(
-                text = "${room.currentMembers} / ${room.maxMembers} 人",
-                style = MaterialTheme.typography.bodyMedium,
+                text = when {
+                    joining -> "进入中"
+                    isFull -> "满员"
+                    else -> "进入"
+                },
+                color = when {
+                    isFull -> MaterialTheme.colorScheme.error
+                    joining -> MaterialTheme.colorScheme.onSurfaceVariant
+                    else -> MaterialTheme.colorScheme.primary
+                },
             )
         }
     }
