@@ -26,7 +26,6 @@ import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.CenteredFormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
-import love.moonc.room.ui.components.RoomScaffold
 
 @Composable
 fun LoginScreen(
@@ -38,37 +37,35 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
 
-    RoomScaffold { modifier ->
-        CenteredFormColumn(modifier.fillMaxSize()) {
-            Spacer(Modifier.height(80.dp))
-            Text(
-                text = "Room",
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(Modifier.height(20.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+    CenteredFormColumn(Modifier.fillMaxSize()) {
+        Spacer(Modifier.height(80.dp))
+        Text(
+            text = "Room",
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.height(20.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
+            TextButton(
+                onClick = { viewModel.sendLoginCode(email) },
+                enabled = !state.sendingLoginCode && state.loginCodeCountdownSeconds == 0,
+                modifier = Modifier.heightIn(min = 56.dp),
             ) {
-                FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
-                TextButton(
-                    onClick = { viewModel.sendLoginCode(email) },
-                    enabled = !state.sendingLoginCode && state.loginCodeCountdownSeconds == 0,
-                    modifier = Modifier.heightIn(min = 56.dp),
-                ) {
-                    Text(
-                        when {
-                            state.sendingLoginCode -> "发送中"
-                            state.loginCodeCountdownSeconds > 0 -> "${state.loginCodeCountdownSeconds}s"
-                            else -> "发送验证码"
-                        },
-                    )
-                }
+                Text(
+                    when {
+                        state.sendingLoginCode -> "发送中"
+                        state.loginCodeCountdownSeconds > 0 -> "${state.loginCodeCountdownSeconds}s"
+                        else -> "发送验证码"
+                    },
+                )
             }
-            FormTextField(code, { code = it }, "验证码")
-            PrimaryButton("登录", state.loading, { viewModel.login(email, code, onLoginSuccess) })
         }
+        FormTextField(code, { code = it }, "验证码")
+        PrimaryButton("登录", state.loading, { viewModel.login(email, code, onLoginSuccess) })
     }
 }

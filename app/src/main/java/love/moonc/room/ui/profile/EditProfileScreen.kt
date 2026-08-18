@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
@@ -17,7 +16,6 @@ import love.moonc.room.ui.components.AvatarPicker
 import love.moonc.room.ui.components.CenteredFormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
-import love.moonc.room.ui.components.RoomScaffold
 
 @Composable
 fun EditProfileScreen(
@@ -34,21 +32,19 @@ fun EditProfileScreen(
         state.user?.let { nickname = it.nickname }
     }
 
-    RoomScaffold { modifier ->
-        CenteredFormColumn(modifier = modifier) {
-            AvatarPicker(
-                avatarUri = avatarUri,
-                avatarUrl = state.user?.avatarUrl,
-                uploading = state.uploadingAvatar,
-                onAvatarSelected = { uri ->
-                    avatarUri = uri
-                    viewModel.updateAvatar(context, uri) {
-                        avatarUri = null
-                    }
-                },
-            )
-            FormTextField(nickname, { nickname = it }, "昵称")
-            PrimaryButton("保存", state.loading, { viewModel.save(nickname, onSaved) })
-        }
+    CenteredFormColumn {
+        AvatarPicker(
+            avatarUri = avatarUri,
+            avatarUrl = state.user?.avatarUrl,
+            uploading = state.uploadingAvatar,
+            onAvatarSelected = { uri ->
+                avatarUri = uri
+                viewModel.updateAvatar(context, uri) {
+                    avatarUri = null
+                }
+            },
+        )
+        FormTextField(nickname, { nickname = it }, "昵称")
+        PrimaryButton("保存", state.loading, { viewModel.save(nickname, onSaved) })
     }
 }
