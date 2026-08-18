@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
@@ -41,9 +41,12 @@ fun LoginScreen(
     RoomScaffold(title = "") { modifier ->
         CenteredFormColumn(modifier.fillMaxSize()) {
             Spacer(Modifier.height(80.dp))
-            Text("Room", style = MaterialTheme.typography.headlineMedium)
-            Text("邮箱验证码登录", style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "Room",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(20.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

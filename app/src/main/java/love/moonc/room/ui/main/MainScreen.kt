@@ -251,7 +251,6 @@ private fun MeContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(user.nickname, style = MaterialTheme.typography.titleLarge)
-                    Text("账号  ${user.account}")
                     Text("邮箱  ${user.email}")
                 }
             }

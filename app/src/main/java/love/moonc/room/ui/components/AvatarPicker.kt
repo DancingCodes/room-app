@@ -33,7 +33,6 @@ fun AvatarPicker(
     avatarUrl: String?,
     uploading: Boolean,
     onAvatarSelected: (Uri) -> Unit,
-    showActionText: Boolean = true,
 ) {
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
@@ -86,10 +85,8 @@ fun AvatarPicker(
                 }
             }
         }
-        if (showActionText) {
-            TextButton(onClick = { openGallery() }, enabled = !uploading) {
-                Text(if (uploading) "上传中" else "选择头像")
-            }
+        TextButton(onClick = { openGallery() }, enabled = !uploading) {
+            Text(if (uploading) "上传中" else "选择头像")
         }
     }
 }

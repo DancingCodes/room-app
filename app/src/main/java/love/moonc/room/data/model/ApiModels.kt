@@ -22,15 +22,8 @@ data class UserPayload(
 )
 
 @Serializable
-data class AvatarPayload(
-    @SerialName("avatar_url")
-    val avatarUrl: String,
-)
-
-@Serializable
 data class User(
     val id: Long,
-    val account: String,
     val email: String,
     val nickname: String,
     @SerialName("avatar_url")
