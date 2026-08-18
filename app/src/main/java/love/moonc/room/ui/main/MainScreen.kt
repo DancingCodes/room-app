@@ -258,7 +258,7 @@ private fun MeContent(
                 ) {
                     ProfileAvatar(avatarUrl = user.avatarUrl)
                     Text(user.nickname, style = MaterialTheme.typography.titleLarge)
-                    Text("邮箱  ${user.email}")
+                    Text(user.email)
                 }
             }
         }

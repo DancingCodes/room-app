@@ -42,7 +42,7 @@ fun EditProfileScreen(
                 uploading = state.uploadingAvatar,
                 onAvatarSelected = { uri ->
                     avatarUri = uri
-                    viewModel.updateAvatar(context, uri, onSaved)
+                    viewModel.updateAvatar(context, uri)
                 },
             )
             FormTextField(nickname, { nickname = it }, "昵称")

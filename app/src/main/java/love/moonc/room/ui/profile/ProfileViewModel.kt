@@ -59,13 +59,12 @@ class ProfileViewModel(
         }
     }
 
-    fun updateAvatar(context: Context, uri: Uri, onSaved: (User) -> Unit) {
+    fun updateAvatar(context: Context, uri: Uri) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(uploadingAvatar = true)
             runCatching { api.updateMyAvatar(uri.toAvatarPart(context)).requireData().user }
                 .onSuccess { user ->
                     _uiState.value = ProfileUiState(user = user)
-                    onSaved(user)
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(uploadingAvatar = false)
