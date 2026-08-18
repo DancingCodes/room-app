@@ -94,7 +94,10 @@ fun RegisterScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
-                TextButton(onClick = { viewModel.sendRegisterCode(email) }) { Text("发验证码") }
+                TextButton(
+                    onClick = { viewModel.sendRegisterCode(email) },
+                    modifier = Modifier.height(56.dp),
+                ) { Text("发送验证码") }
             }
             FormTextField(code, { code = it }, "验证码")
             FormTextField(account, { account = it }, "账号")
@@ -126,7 +129,10 @@ fun ResetPasswordScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
-                TextButton(onClick = { viewModel.sendPasswordResetCode(email) }) { Text("发验证码") }
+                TextButton(
+                    onClick = { viewModel.sendPasswordResetCode(email) },
+                    modifier = Modifier.height(56.dp),
+                ) { Text("发送验证码") }
             }
             FormTextField(code, { code = it }, "验证码")
             FormTextField(password, { password = it }, "新密码", password = true)
