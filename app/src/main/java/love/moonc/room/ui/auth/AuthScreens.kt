@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +39,12 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
 
-    CenteredFormColumn(Modifier.fillMaxSize()) {
+    CenteredFormColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .offset(y = -RoomSpacing.LoginLift),
+        verticalArrangement = Arrangement.Center,
+    ) {
         Text(
             text = "Room",
             style = MaterialTheme.typography.displaySmall,
@@ -65,6 +72,11 @@ fun LoginScreen(
             }
         }
         FormTextField(code, { code = it }, "验证码")
-        PrimaryButton("登录", state.loading, { viewModel.login(email, code, onLoginSuccess) })
+        PrimaryButton(
+            text = "登录",
+            loading = state.loading,
+            onClick = { viewModel.login(email, code, onLoginSuccess) },
+            modifier = Modifier.padding(top = RoomSpacing.CompactGap),
+        )
     }
 }

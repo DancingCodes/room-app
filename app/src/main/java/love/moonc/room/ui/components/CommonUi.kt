@@ -35,6 +35,7 @@ object RoomSpacing {
     val ItemGap = 12.dp
     val CompactGap = 8.dp
     val SectionGap = 20.dp
+    val LoginLift = 48.dp
     val CardPadding = 16.dp
     val ProfileCardPadding = 20.dp
     val FieldMinHeight = 56.dp
@@ -118,6 +119,7 @@ fun FormColumn(
 fun CenteredFormColumn(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = RoomSpacing.ScreenPadding,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -128,6 +130,7 @@ fun CenteredFormColumn(
             .verticalScroll(rememberScrollState())
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = verticalArrangement,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().widthIn(max = RoomSpacing.ContentMaxWidth),
