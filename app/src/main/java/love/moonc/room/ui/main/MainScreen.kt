@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,17 +30,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import love.moonc.room.di.AppContainer
 import love.moonc.room.data.model.Room
+import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 
 enum class MainTab {
@@ -69,9 +69,6 @@ fun MainScreen(
                 title = {},
                 actions = {
                     if (tab == MainTab.Home) {
-                        IconButton(onClick = viewModel::refresh, enabled = !state.loading) {
-                            Icon(Icons.Filled.Refresh, contentDescription = "刷新")
-                        }
                         IconButton(onClick = onCreateRoom) {
                             Icon(Icons.Filled.Add, contentDescription = "创建")
                         }
@@ -115,6 +112,7 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
     modifier: Modifier,
@@ -123,29 +121,44 @@ private fun HomeContent(
     onLoadMore: () -> Unit,
     onJoinRoom: (Long) -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        if (state.rooms.isEmpty()) {
-            EmptyRooms(
-                loading = state.loading,
-                onRefresh = onRefresh,
-            )
-            return@Column
-        }
+    PullToRefreshBox(
+        isRefreshing = state.loading,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize(),
+    ) {
         LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize(),
         ) {
-            items(state.rooms, key = { it.id }) { room ->
-                RoomItem(room = room, onJoinRoom = onJoinRoom)
-            }
-            if (state.hasMore) {
+            if (state.rooms.isEmpty()) {
                 item {
-                    Button(
-                        onClick = onLoadMore,
-                        enabled = !state.loadingMore,
-                        modifier = Modifier.fillMaxWidth(),
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(if (state.loadingMore) "加载中" else "加载更多")
+                        Text(
+                            text = if (state.loading) "正在加载房间" else "暂无房间",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+            } else {
+                items(state.rooms, key = { it.id }) { room ->
+                    RoomItem(
+                        room = room,
+                        joining = state.joiningRoomId == room.id,
+                        onJoinRoom = onJoinRoom,
+                    )
+                }
+                if (state.hasMore) {
+                    item {
+                        Button(
+                            onClick = onLoadMore,
+                            enabled = !state.loadingMore,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(if (state.loadingMore) "加载中" else "加载更多")
+                        }
                     }
                 }
             }
@@ -154,36 +167,17 @@ private fun HomeContent(
 }
 
 @Composable
-private fun EmptyRooms(
-    loading: Boolean,
-    onRefresh: () -> Unit,
+private fun RoomItem(
+    room: Room,
+    joining: Boolean,
+    onJoinRoom: (Long) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = if (loading) "正在加载房间" else "暂无房间",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            TextButton(onClick = onRefresh, enabled = !loading) {
-                Text("刷新")
-            }
-        }
-    }
-}
-
-@Composable
-private fun RoomItem(room: Room, onJoinRoom: (Long) -> Unit) {
     val isFull = room.currentMembers >= room.maxMembers
+    val canJoin = !isFull && !joining
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = !isFull) { onJoinRoom(room.id) },
+            .clickable(enabled = canJoin) { onJoinRoom(room.id) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
@@ -199,22 +193,21 @@ private fun RoomItem(room: Room, onJoinRoom: (Long) -> Unit) {
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = if (isFull) "满员" else "进入",
-                    color = if (isFull) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
+                    text = when {
+                        joining -> "进入中"
+                        isFull -> "满员"
+                        else -> "进入"
+                    },
+                    color = when {
+                        isFull -> MaterialTheme.colorScheme.error
+                        joining -> MaterialTheme.colorScheme.onSurfaceVariant
+                        else -> MaterialTheme.colorScheme.primary
                     },
                 )
             }
             Text(
                 text = "${room.currentMembers} / ${room.maxMembers} 人",
                 style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                text = room.createdAt,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

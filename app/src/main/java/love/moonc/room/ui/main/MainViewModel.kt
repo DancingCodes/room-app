@@ -15,6 +15,7 @@ import love.moonc.room.ui.message.MessageCenter
 data class MainUiState(
     val loading: Boolean = false,
     val loadingMore: Boolean = false,
+    val joiningRoomId: Long? = null,
     val rooms: List<Room> = emptyList(),
     val user: User? = null,
     val page: Int = 0,
@@ -83,15 +84,19 @@ class MainViewModel(
     }
 
     fun joinRoom(roomId: Long, onJoined: (Long) -> Unit) {
+        if (_uiState.value.joiningRoomId != null) return
+
+        _uiState.value = _uiState.value.copy(joiningRoomId = roomId)
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.joinRoom(roomId).requireData() }
-                .onSuccess { detail -> onJoined(detail.room.id) }
+                .onSuccess { detail ->
+                    _uiState.value = _uiState.value.copy(joiningRoomId = null)
+                    onJoined(detail.room.id)
+                }
                 .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(loading = false)
+                    _uiState.value = _uiState.value.copy(joiningRoomId = null)
                     messageCenter.show(error.userMessage())
                 }
         }
     }
-
 }
