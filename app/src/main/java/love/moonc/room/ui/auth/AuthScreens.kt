@@ -55,9 +55,17 @@ fun LoginScreen(
                 FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
                 TextButton(
                     onClick = { viewModel.sendLoginCode(email) },
-                    enabled = !state.sendingLoginCode,
+                    enabled = !state.sendingLoginCode && state.loginCodeCountdownSeconds == 0,
                     modifier = Modifier.heightIn(min = 56.dp),
-                ) { Text(if (state.sendingLoginCode) "发送中" else "发送验证码") }
+                ) {
+                    Text(
+                        when {
+                            state.sendingLoginCode -> "发送中"
+                            state.loginCodeCountdownSeconds > 0 -> "${state.loginCodeCountdownSeconds}s"
+                            else -> "发送验证码"
+                        },
+                    )
+                }
             }
             FormTextField(code, { code = it }, "验证码")
             PrimaryButton("登录", state.loading, { viewModel.login(email, code, onLoginSuccess) })

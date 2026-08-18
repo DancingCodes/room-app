@@ -1,7 +1,10 @@
 package love.moonc.room.ui.auth
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,6 +21,7 @@ import love.moonc.room.ui.message.MessageCenter
 data class AuthUiState(
     val loading: Boolean = false,
     val sendingLoginCode: Boolean = false,
+    val loginCodeCountdownSeconds: Int = 0,
 )
 
 class AuthViewModel(
@@ -27,14 +31,13 @@ class AuthViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState
+    private var loginCodeCountdownJob: Job? = null
 
     fun sendLoginCode(email: String) {
         val trimmedEmail = email.trim()
-        if (trimmedEmail.isBlank()) {
-            messageCenter.show("请填写邮箱")
-            return
-        }
-        if (_uiState.value.sendingLoginCode) return
+        if (!validateEmail(trimmedEmail)) return
+        val state = _uiState.value
+        if (state.sendingLoginCode || state.loginCodeCountdownSeconds > 0) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(sendingLoginCode = true)
@@ -42,6 +45,7 @@ class AuthViewModel(
                 .onSuccess {
                     _uiState.value = _uiState.value.copy(sendingLoginCode = false)
                     messageCenter.show("验证码已发送")
+                    startLoginCodeCountdown()
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(sendingLoginCode = false)
@@ -53,8 +57,9 @@ class AuthViewModel(
     fun login(email: String, emailCode: String, onSuccess: (User) -> Unit) {
         val trimmedEmail = email.trim()
         val trimmedEmailCode = emailCode.trim()
-        if (trimmedEmail.isBlank() || trimmedEmailCode.isBlank()) {
-            messageCenter.show("请填写邮箱和验证码")
+        if (!validateEmail(trimmedEmail)) return
+        if (trimmedEmailCode.isBlank()) {
+            messageCenter.show("请填写验证码")
             return
         }
 
@@ -71,5 +76,28 @@ class AuthViewModel(
                     messageCenter.show(error.userMessage())
                 }
         }
+    }
+
+    private fun startLoginCodeCountdown() {
+        loginCodeCountdownJob?.cancel()
+        loginCodeCountdownJob = viewModelScope.launch {
+            for (seconds in 60 downTo 1) {
+                _uiState.value = _uiState.value.copy(loginCodeCountdownSeconds = seconds)
+                delay(1000)
+            }
+            _uiState.value = _uiState.value.copy(loginCodeCountdownSeconds = 0)
+        }
+    }
+
+    private fun validateEmail(email: String): Boolean {
+        if (email.isBlank()) {
+            messageCenter.show("请填写邮箱")
+            return false
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            messageCenter.show("请填写正确的邮箱")
+            return false
+        }
+        return true
     }
 }

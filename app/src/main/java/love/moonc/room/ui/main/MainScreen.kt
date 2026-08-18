@@ -66,7 +66,7 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (tab == MainTab.Home) "首页" else "我的") },
+                title = {},
                 actions = {
                     if (tab == MainTab.Home) {
                         IconButton(onClick = viewModel::refresh, enabled = !state.loading) {
