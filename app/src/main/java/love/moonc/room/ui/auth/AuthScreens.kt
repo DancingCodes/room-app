@@ -83,6 +83,7 @@ fun RegisterScreen(
                 avatarUri = avatarUri,
                 avatarUrl = state.avatarUrl,
                 uploading = state.uploadingAvatar,
+                showActionText = false,
                 onAvatarSelected = { uri ->
                     avatarUri = uri
                     viewModel.uploadRegisterAvatar(context, uri)
