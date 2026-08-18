@@ -28,14 +28,13 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomScaffold(
-    title: String,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = {},
                 actions = actions,
             )
         },

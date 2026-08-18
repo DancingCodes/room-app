@@ -43,7 +43,7 @@ fun CreateRoomScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    RoomScaffold(title = "创建房间") { modifier ->
+    RoomScaffold { modifier ->
         FormColumn(modifier = modifier) {
             Text("房间人数", style = MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -83,9 +83,7 @@ fun RoomDetailScreen(
         }
     }
 
-    RoomScaffold(
-        title = detail?.room?.name ?: "房间详情",
-        actions = {
+    RoomScaffold(actions = {
             IconButton(onClick = { viewModel.leave(roomId) { onLeft(null) } }) {
                 Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "离开")
             }

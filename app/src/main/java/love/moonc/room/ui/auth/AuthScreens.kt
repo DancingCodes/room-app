@@ -38,7 +38,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
 
-    RoomScaffold(title = "") { modifier ->
+    RoomScaffold { modifier ->
         CenteredFormColumn(modifier.fillMaxSize()) {
             Spacer(Modifier.height(80.dp))
             Text(
