@@ -7,19 +7,62 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
+object RoomSpacing {
+    val ScreenHorizontal = 16.dp
+    val ScreenTop = 24.dp
+    val ScreenBottom = 16.dp
+    val ScreenPadding = PaddingValues(
+        start = ScreenHorizontal,
+        top = ScreenTop,
+        end = ScreenHorizontal,
+        bottom = ScreenBottom,
+    )
+    val ItemGap = 12.dp
+    val CompactGap = 8.dp
+    val SectionGap = 20.dp
+    val CardPadding = 16.dp
+    val ProfileCardPadding = 20.dp
+    val FieldMinHeight = 56.dp
+    val AvatarSize = 88.dp
+    val ContentMaxWidth = 420.dp
+    val SwipeLeaveThreshold = 96.dp
+}
+
+@Composable
+fun ScreenColumn(
+    modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(RoomSpacing.ItemGap),
+    contentPadding: PaddingValues = RoomSpacing.ScreenPadding,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(contentPadding),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+    ) {
+        content()
+    }
+}
 
 @Composable
 fun FormTextField(
@@ -48,7 +91,7 @@ fun PrimaryButton(
     Button(
         onClick = onClick,
         enabled = enabled && !loading,
-        modifier = modifier.fillMaxWidth().heightIn(min = 48.dp),
+        modifier = modifier.fillMaxWidth().heightIn(min = RoomSpacing.FieldMinHeight),
     ) {
         if (loading) {
             CircularProgressIndicator()
@@ -64,31 +107,31 @@ fun FormColumn(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ScreenColumn(
+        modifier = modifier,
         horizontalAlignment = horizontalAlignment,
-    ) {
-        content()
-    }
+        content = content,
+    )
 }
 
 @Composable
 fun CenteredFormColumn(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+    contentPadding: PaddingValues = RoomSpacing.ScreenPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().widthIn(max = 420.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth().widthIn(max = RoomSpacing.ContentMaxWidth),
+            verticalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
             horizontalAlignment = Alignment.CenterHorizontally,
             content = content,
         )

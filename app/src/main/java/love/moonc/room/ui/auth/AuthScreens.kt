@@ -19,13 +19,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.CenteredFormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
+import love.moonc.room.ui.components.RoomSpacing
 
 @Composable
 fun LoginScreen(
@@ -38,23 +38,22 @@ fun LoginScreen(
     var code by remember { mutableStateOf("") }
 
     CenteredFormColumn(Modifier.fillMaxSize()) {
-        Spacer(Modifier.height(80.dp))
         Text(
             text = "Room",
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(RoomSpacing.SectionGap))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             FormTextField(email, { email = it }, "邮箱", Modifier.weight(1f))
             TextButton(
                 onClick = { viewModel.sendLoginCode(email) },
                 enabled = !state.sendingLoginCode && state.loginCodeCountdownSeconds == 0,
-                modifier = Modifier.heightIn(min = 56.dp),
+                modifier = Modifier.heightIn(min = RoomSpacing.FieldMinHeight),
             ) {
                 Text(
                     when {

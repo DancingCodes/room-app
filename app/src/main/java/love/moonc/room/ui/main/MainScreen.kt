@@ -1,12 +1,6 @@
 package love.moonc.room.ui.main
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Surface
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -33,9 +28,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,17 +40,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import love.moonc.room.data.model.Room
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
+import love.moonc.room.ui.components.RoomSpacing
 
 enum class MainTab {
     Home,
     Me,
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     appContainer: AppContainer,
@@ -70,18 +67,6 @@ fun MainScreen(
     var tab by remember { mutableStateOf(initialTab) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    if (tab == MainTab.Home) {
-                        IconButton(onClick = onCreateRoom) {
-                            Icon(Icons.Filled.Add, contentDescription = "创建")
-                        }
-                    }
-                },
-            )
-        },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
@@ -103,6 +88,7 @@ fun MainScreen(
             HomeContent(
                 modifier = Modifier.padding(padding),
                 state = state,
+                onCreateRoom = onCreateRoom,
                 onRefresh = viewModel::refresh,
                 onLoadMore = viewModel::loadMoreRooms,
                 onJoinRoom = { roomId -> viewModel.joinRoom(roomId, onRoomClick) },
@@ -123,6 +109,7 @@ fun MainScreen(
 private fun HomeContent(
     modifier: Modifier,
     state: MainUiState,
+    onCreateRoom: () -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onJoinRoom: (Long) -> Unit,
@@ -132,38 +119,53 @@ private fun HomeContent(
         onRefresh = onRefresh,
         modifier = modifier.fillMaxSize(),
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(RoomSpacing.ScreenPadding),
+            verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
         ) {
-            if (state.rooms.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (state.loading) "正在加载房间" else "暂无房间",
-                            style = MaterialTheme.typography.titleMedium,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                IconButton(onClick = onCreateRoom) {
+                    Icon(Icons.Filled.Add, contentDescription = "创建")
+                }
+            }
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
+            ) {
+                if (state.rooms.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = if (state.loading) "正在加载房间" else "暂无房间",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
+                    }
+                } else {
+                    items(state.rooms, key = { it.id }) { room ->
+                        RoomItem(
+                            room = room,
+                            joining = state.joiningRoomId == room.id,
+                            onJoinRoom = onJoinRoom,
                         )
                     }
-                }
-            } else {
-                items(state.rooms, key = { it.id }) { room ->
-                    RoomItem(
-                        room = room,
-                        joining = state.joiningRoomId == room.id,
-                        onJoinRoom = onJoinRoom,
-                    )
-                }
-                if (state.hasMore) {
-                    item {
-                        Button(
-                            onClick = onLoadMore,
-                            enabled = !state.loadingMore,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(if (state.loadingMore) "加载中" else "加载更多")
+                    if (state.hasMore) {
+                        item {
+                            Button(
+                                onClick = onLoadMore,
+                                enabled = !state.loadingMore,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(if (state.loadingMore) "加载中" else "加载更多")
+                            }
                         }
                     }
                 }
@@ -189,13 +191,13 @@ private fun RoomItem(
         ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(RoomSpacing.CardPadding),
+            horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
             ) {
                 Text(
                     text = room.name,
@@ -231,9 +233,11 @@ private fun MeContent(
 ) {
     val user = state.user
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(RoomSpacing.ScreenPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
     ) {
         if (user == null) {
             Box(
@@ -252,9 +256,9 @@ private fun MeContent(
                 ),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    modifier = Modifier.fillMaxWidth().padding(RoomSpacing.ProfileCardPadding),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
                 ) {
                     ProfileAvatar(avatarUrl = user.avatarUrl)
                     Text(user.nickname, style = MaterialTheme.typography.titleLarge)
@@ -271,12 +275,12 @@ private fun MeContent(
 private fun ProfileAvatar(avatarUrl: String?) {
     Surface(
         modifier = Modifier
-            .size(88.dp)
+            .size(RoomSpacing.AvatarSize)
             .clip(CircleShape),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        tonalElevation = 2.dp,
+        tonalElevation = RoomSpacing.CompactGap / 4,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

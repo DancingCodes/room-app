@@ -1,6 +1,7 @@
 package love.moonc.room.ui.profile
 
 import android.net.Uri
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -8,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
@@ -32,7 +34,7 @@ fun EditProfileScreen(
         state.user?.let { nickname = it.nickname }
     }
 
-    CenteredFormColumn {
+    CenteredFormColumn(Modifier.fillMaxSize()) {
         AvatarPicker(
             avatarUri = avatarUri,
             avatarUrl = state.user?.avatarUrl,

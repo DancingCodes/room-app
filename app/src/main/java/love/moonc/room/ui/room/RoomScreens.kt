@@ -32,11 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.PrimaryButton
+import love.moonc.room.ui.components.RoomSpacing
+import love.moonc.room.ui.components.ScreenColumn
 
 @Composable
 fun CreateRoomScreen(
@@ -48,7 +49,7 @@ fun CreateRoomScreen(
 
     FormColumn(modifier = Modifier.fillMaxSize()) {
         Text("房间人数", style = MaterialTheme.typography.titleMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap)) {
             FilterChip(
                 selected = state.selectedMaxMembers == 2,
                 onClick = { viewModel.selectMaxMembers(2) },
@@ -73,7 +74,7 @@ fun RoomDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val detail = state.detail
-    val leaveThresholdPx = with(LocalDensity.current) { 96.dp.toPx() }
+    val leaveThresholdPx = with(LocalDensity.current) { RoomSpacing.SwipeLeaveThreshold.toPx() }
     var showLeaveConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(roomId) {
@@ -109,26 +110,23 @@ fun RoomDetailScreen(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(roomId, detail != null, showLeaveConfirm) {
-                var dragDistance = 0f
-                detectHorizontalDragGestures(
-                    onDragEnd = { dragDistance = 0f },
-                    onDragCancel = { dragDistance = 0f },
-                ) { _, dragAmount ->
-                    if (detail != null && !showLeaveConfirm) {
-                        dragDistance += dragAmount
-                        if (dragDistance <= -leaveThresholdPx) {
-                            dragDistance = 0f
-                            showLeaveConfirm = true
-                        }
+    ScreenColumn(
+        modifier = Modifier.pointerInput(roomId, detail != null, showLeaveConfirm) {
+            var dragDistance = 0f
+            detectHorizontalDragGestures(
+                onDragEnd = { dragDistance = 0f },
+                onDragCancel = { dragDistance = 0f },
+            ) { _, dragAmount ->
+                if (detail != null && !showLeaveConfirm) {
+                    dragDistance += dragAmount
+                    if (dragDistance <= -leaveThresholdPx) {
+                        dragDistance = 0f
+                        showLeaveConfirm = true
                     }
                 }
             }
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        },
+        verticalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
     ) {
         if (detail == null) {
             Box(
@@ -139,7 +137,7 @@ fun RoomDetailScreen(
                     Text(if (state.loading) "加载中" else "暂无房间信息")
                 }
             }
-            return@Column
+            return@ScreenColumn
         }
 
         val currentMember = detail.members.firstOrNull()
@@ -150,10 +148,10 @@ fun RoomDetailScreen(
             ),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(RoomSpacing.CardPadding),
+                verticalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap)) {
                     Text(
                         text = "${detail.room.currentMembers} / ${detail.room.maxMembers} 人",
                         style = MaterialTheme.typography.titleMedium,
@@ -171,13 +169,13 @@ fun RoomDetailScreen(
                 }
                 Text("成员", style = MaterialTheme.typography.titleSmall)
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(max = RoomSpacing.AvatarSize * 2),
+                    verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
                 ) {
                     items(detail.members, key = { it.userId }) { member ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
                         ) {
                             Text(member.nickname, modifier = Modifier.weight(1f))
                             if (member.isOwner) Text("房主")
@@ -191,7 +189,7 @@ fun RoomDetailScreen(
         Text("消息", style = MaterialTheme.typography.titleMedium)
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
         ) {
             if (state.hasOlderMessages) {
                 item {
@@ -211,7 +209,7 @@ fun RoomDetailScreen(
                 )
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap)) {
             OutlinedTextField(
                 value = state.input,
                 onValueChange = viewModel::updateInput,
@@ -221,7 +219,7 @@ fun RoomDetailScreen(
             )
             Button(
                 onClick = { viewModel.sendMessage(roomId) },
-                modifier = Modifier.heightIn(min = 56.dp),
+                modifier = Modifier.heightIn(min = RoomSpacing.FieldMinHeight),
             ) {
                 Text("发送")
             }

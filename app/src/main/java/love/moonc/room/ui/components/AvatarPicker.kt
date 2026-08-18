@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
@@ -46,24 +45,24 @@ fun AvatarPicker(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
     ) {
         Surface(
             modifier = Modifier
-                .size(88.dp)
+                .size(RoomSpacing.AvatarSize)
                 .clip(CircleShape)
                 .clickable(enabled = !uploading) { openGallery() },
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            tonalElevation = 2.dp,
+            tonalElevation = RoomSpacing.CompactGap / 4,
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
                 when {
-                    uploading -> CircularProgressIndicator(modifier = Modifier.size(28.dp))
+                    uploading -> CircularProgressIndicator(modifier = Modifier.size(RoomSpacing.SectionGap + RoomSpacing.CompactGap))
                     avatarUri != null -> AsyncImage(
                         model = avatarUri,
                         contentDescription = "头像",
