@@ -9,30 +9,10 @@ data class EmailCodeRequest(
 )
 
 @Serializable
-data class RegisterRequest(
-    val account: String,
+data class EmailLoginRequest(
     val email: String,
     @SerialName("email_code")
     val emailCode: String,
-    val password: String,
-    val nickname: String,
-    @SerialName("avatar_url")
-    val avatarUrl: String,
-)
-
-@Serializable
-data class LoginRequest(
-    val account: String,
-    val password: String,
-)
-
-@Serializable
-data class ResetPasswordRequest(
-    val email: String,
-    @SerialName("email_code")
-    val emailCode: String,
-    @SerialName("new_password")
-    val newPassword: String,
 )
 
 @Serializable

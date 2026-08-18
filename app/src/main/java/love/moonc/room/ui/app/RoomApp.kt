@@ -18,8 +18,6 @@ import androidx.navigation.navArgument
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.auth.LoginScreen
-import love.moonc.room.ui.auth.RegisterScreen
-import love.moonc.room.ui.auth.ResetPasswordScreen
 import love.moonc.room.ui.main.MainScreen
 import love.moonc.room.ui.main.MainTab
 import love.moonc.room.ui.message.CenterMessageHost
@@ -56,25 +54,6 @@ fun RoomApp(
                 LoginScreen(
                     appContainer = appContainer,
                     onLoginSuccess = { user -> appViewModel.setUser(user) },
-                    onRegisterClick = { navController.navigate(Routes.Register) },
-                    onResetPasswordClick = { navController.navigate(Routes.ResetPassword) },
-                )
-            }
-            composable(Routes.Register) {
-                RegisterScreen(
-                    appContainer = appContainer,
-                    onRegisterSuccess = { user -> appViewModel.setUser(user) },
-                )
-            }
-            composable(Routes.ResetPassword) {
-                ResetPasswordScreen(
-                    appContainer = appContainer,
-                    onResetSuccess = {
-                        navController.navigate(Routes.Login) {
-                            popUpTo(Routes.Login) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    },
                 )
             }
             composable(Routes.Main) {

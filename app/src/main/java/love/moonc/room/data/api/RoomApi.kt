@@ -2,16 +2,13 @@ package love.moonc.room.data.api
 
 import love.moonc.room.data.model.ApiResponse
 import love.moonc.room.data.model.AuthResult
-import love.moonc.room.data.model.AvatarPayload
 import love.moonc.room.data.model.CreateMessageRequest
 import love.moonc.room.data.model.CreateRoomRequest
 import love.moonc.room.data.model.EmailCodeRequest
-import love.moonc.room.data.model.LoginRequest
+import love.moonc.room.data.model.EmailLoginRequest
 import love.moonc.room.data.model.MemberPayload
 import love.moonc.room.data.model.MessageListPayload
 import love.moonc.room.data.model.MessagePayload
-import love.moonc.room.data.model.RegisterRequest
-import love.moonc.room.data.model.ResetPasswordRequest
 import love.moonc.room.data.model.RoomDetail
 import love.moonc.room.data.model.RoomListPayload
 import love.moonc.room.data.model.UpdateMeRequest
@@ -28,24 +25,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RoomApi {
-    @Multipart
-    @POST("api/v1/uploads/avatar")
-    suspend fun uploadRegisterAvatar(@Part file: MultipartBody.Part): ApiResponse<AvatarPayload>
+    @POST("api/v1/auth/email-code")
+    suspend fun sendEmailLoginCode(@Body body: EmailCodeRequest): ApiResponse<Unit>
 
-    @POST("api/v1/auth/register-code")
-    suspend fun sendRegisterCode(@Body body: EmailCodeRequest): ApiResponse<Unit>
-
-    @POST("api/v1/auth/register")
-    suspend fun register(@Body body: RegisterRequest): ApiResponse<AuthResult>
-
-    @POST("api/v1/auth/login")
-    suspend fun login(@Body body: LoginRequest): ApiResponse<AuthResult>
-
-    @POST("api/v1/auth/password-reset-code")
-    suspend fun sendPasswordResetCode(@Body body: EmailCodeRequest): ApiResponse<Unit>
-
-    @POST("api/v1/auth/reset-password")
-    suspend fun resetPassword(@Body body: ResetPasswordRequest): ApiResponse<Unit>
+    @POST("api/v1/auth/email-login")
+    suspend fun emailLogin(@Body body: EmailLoginRequest): ApiResponse<AuthResult>
 
     @GET("api/v1/users/me")
     suspend fun me(): ApiResponse<UserPayload>
