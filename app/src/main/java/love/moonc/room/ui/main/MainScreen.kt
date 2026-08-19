@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,7 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import love.moonc.room.data.model.Room
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
@@ -287,11 +288,30 @@ private fun ProfileAvatar(avatarUrl: String?) {
             contentAlignment = Alignment.Center,
         ) {
             if (!avatarUrl.isNullOrBlank()) {
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = avatarUrl,
                     contentDescription = "头像",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(RoomSpacing.ButtonLoadingSize),
+                                strokeWidth = RoomSpacing.CompactGap / 4,
+                            )
+                        }
+                    },
+                    error = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(Icons.Filled.Person, contentDescription = "头像")
+                        }
+                    },
                 )
             } else {
                 Icon(Icons.Filled.Person, contentDescription = "头像")
