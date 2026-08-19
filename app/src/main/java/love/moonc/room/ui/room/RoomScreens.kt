@@ -1,5 +1,6 @@
 package love.moonc.room.ui.room
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -20,11 +21,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -102,6 +105,14 @@ fun RoomDetailScreen(
         if (state.disconnected) {
             onLeft("连接已断开，已离开房间")
         }
+    }
+
+    BackHandler(enabled = detail != null && !showLeaveConfirm) {
+        showLeaveConfirm = true
+    }
+
+    BackHandler(enabled = showLeaveConfirm) {
+        showLeaveConfirm = false
     }
 
     if (showLeaveConfirm) {
@@ -210,11 +221,12 @@ fun RoomDetailScreen(
                 modifier = Modifier.weight(1f),
                 singleLine = true,
             )
-            Button(
+            IconButton(
                 onClick = { viewModel.sendMessage(roomId) },
-                modifier = Modifier.heightIn(min = RoomSpacing.FieldMinHeight),
+                enabled = state.input.isNotBlank(),
+                modifier = Modifier.size(RoomSpacing.FieldMinHeight),
             ) {
-                Text("发送")
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "发送")
             }
         }
 
