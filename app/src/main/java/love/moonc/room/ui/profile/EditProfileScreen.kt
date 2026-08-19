@@ -42,15 +42,14 @@ fun EditProfileScreen(
         AvatarPicker(
             avatarUri = avatarUri,
             avatarUrl = state.user?.avatarUrl,
-            uploading = state.uploadingAvatar,
-            onAvatarSelected = { uri ->
-                avatarUri = uri
-                viewModel.updateAvatar(context, uri) {
-                    avatarUri = null
-                }
-            },
+            uploading = state.loading,
+            onAvatarSelected = { uri -> avatarUri = uri },
         )
         FormTextField(nickname, { nickname = it }, "昵称")
-        PrimaryButton("保存", state.loading, { viewModel.save(nickname, onSaved) })
+        PrimaryButton(
+            text = "保存",
+            loading = state.loading,
+            onClick = { viewModel.save(context, nickname, avatarUri, onSaved) },
+        )
     }
 }

@@ -17,6 +17,10 @@ data class AuthResult(
 )
 
 @Serializable
+data class UploadImagePayload(
+    val url: String,
+)
+@Serializable
 data class UserPayload(
     val user: User,
 )

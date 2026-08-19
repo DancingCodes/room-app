@@ -14,6 +14,7 @@ import love.moonc.room.data.model.RoomListPayload
 import love.moonc.room.data.model.UpdateMeRequest
 import love.moonc.room.data.model.UpdateMicRequest
 import love.moonc.room.data.model.UserPayload
+import love.moonc.room.data.model.UploadImagePayload
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -38,8 +39,8 @@ interface RoomApi {
     suspend fun updateMe(@Body body: UpdateMeRequest): ApiResponse<UserPayload>
 
     @Multipart
-    @POST("api/v1/users/me/avatar")
-    suspend fun updateMyAvatar(@Part file: MultipartBody.Part): ApiResponse<UserPayload>
+    @POST("api/v1/uploads/image")
+    suspend fun uploadImage(@Part file: MultipartBody.Part): ApiResponse<UploadImagePayload>
 
     @GET("api/v1/rooms")
     suspend fun rooms(

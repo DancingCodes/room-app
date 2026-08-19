@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +41,7 @@ object RoomSpacing {
     val CardPadding = 16.dp
     val ProfileCardPadding = 20.dp
     val FieldMinHeight = 56.dp
+    val ButtonLoadingSize = 20.dp
     val AvatarSize = 88.dp
     val ContentMaxWidth = 420.dp
     val SwipeLeaveThreshold = 96.dp
@@ -95,7 +98,11 @@ fun PrimaryButton(
         modifier = modifier.fillMaxWidth().heightIn(min = RoomSpacing.FieldMinHeight),
     ) {
         if (loading) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.size(RoomSpacing.ButtonLoadingSize),
+                strokeWidth = RoomSpacing.CompactGap / 4,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
         } else {
             Text(text)
         }
