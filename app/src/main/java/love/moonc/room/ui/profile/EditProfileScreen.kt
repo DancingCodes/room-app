@@ -1,4 +1,4 @@
-﻿package love.moonc.room.ui.profile
+package love.moonc.room.ui.profile
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler

@@ -116,13 +116,13 @@ private fun MainBottomBar(
     NavigationBar {
         NavigationBarItem(
             selected = selectedTab == MainTab.Home,
-            onClick = onHomeTab,
+            onClick = { if (selectedTab != MainTab.Home) onHomeTab() },
             label = { Text("首页") },
             icon = { Icon(Icons.Filled.Home, contentDescription = null) },
         )
         NavigationBarItem(
             selected = selectedTab == MainTab.Me,
-            onClick = onMeTab,
+            onClick = { if (selectedTab != MainTab.Me) onMeTab() },
             label = { Text("我的") },
             icon = { Icon(Icons.Filled.Person, contentDescription = null) },
         )
