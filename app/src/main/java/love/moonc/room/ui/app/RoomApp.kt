@@ -131,6 +131,7 @@ fun RoomApp(
                     roomId = roomId,
                     onLeft = { message ->
                         appContainer.messageCenter.show(message)
+                        homeViewModel.refresh()
                         navController.navigate(Routes.Home) { popUpTo(0) }
                     },
                     currentUserId = appState.user?.id,
