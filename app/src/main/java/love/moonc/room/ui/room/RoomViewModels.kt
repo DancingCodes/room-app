@@ -47,11 +47,15 @@ class CreateRoomViewModel(
     }
 
     fun create(onCreated: (Long) -> Unit) {
+        if (_uiState.value.loading) return
         viewModelScope.launch {
             val maxMembers = _uiState.value.selectedMaxMembers
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching { api.createRoom(CreateRoomRequest(maxMembers)).requireData() }
-                .onSuccess { detail -> onCreated(detail.room.id) }
+                .onSuccess { detail ->
+                    _uiState.value = _uiState.value.copy(loading = false)
+                    onCreated(detail.room.id)
+                }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(loading = false)
                     messageCenter.show(error.userMessage())

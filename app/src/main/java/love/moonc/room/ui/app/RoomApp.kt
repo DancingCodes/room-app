@@ -104,7 +104,11 @@ fun RoomApp(
             composable(Routes.CreateRoom) {
                 CreateRoomScreen(
                     appContainer = appContainer,
-                    onCreated = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
+                    onCreated = { roomId ->
+                        navController.navigate(Routes.roomDetail(roomId)) {
+                            popUpTo(Routes.CreateRoom) { inclusive = true }
+                        }
+                    },
                 )
             }
             composable(
