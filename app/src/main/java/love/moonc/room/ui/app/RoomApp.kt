@@ -1,4 +1,4 @@
-package love.moonc.room.ui.app
+﻿package love.moonc.room.ui.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.auth.LoginScreen
 import love.moonc.room.ui.main.MainScreen
@@ -85,20 +84,17 @@ fun RoomApp(
                 )
             }
             composable(Routes.EditProfile) {
-                fun navigateToMe() {
-                    navController.navigate(Routes.Me) {
-                        popUpTo(0)
-                        launchSingleTop = true
-                    }
+                fun navigateBack() {
+                    navController.popBackStack()
                 }
 
                 EditProfileScreen(
                     appContainer = appContainer,
-                    onSaved = { user: User ->
+                    onSaved = { user ->
                         appViewModel.updateUser(user)
-                        navigateToMe()
+                        navigateBack()
                     },
-                    onBack = { navigateToMe() },
+                    onBack = { navigateBack() },
                 )
             }
             composable(Routes.CreateRoom) {
