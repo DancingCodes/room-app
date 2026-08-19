@@ -29,16 +29,31 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
 
-    init {
-        refresh()
+    private var loadedUserId: Long? = null
+
+    fun loadForUser(userId: Long) {
+        if (loadedUserId == userId) return
+        refresh(markLoadedUserId = userId)
+    }
+
+    fun clear() {
+        loadedUserId = null
+        _uiState.value = HomeUiState()
     }
 
     fun refresh() {
+        refresh(markLoadedUserId = null)
+    }
+
+    private fun refresh(markLoadedUserId: Long?) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
                 api.rooms(page = 1, pageSize = _uiState.value.pageSize).requireData()
             }.onSuccess { roomPayload ->
+                if (markLoadedUserId != null) {
+                    loadedUserId = markLoadedUserId
+                }
                 _uiState.value = HomeUiState(
                     rooms = roomPayload.list,
                     page = roomPayload.page,

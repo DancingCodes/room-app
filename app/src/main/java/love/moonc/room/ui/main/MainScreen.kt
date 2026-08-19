@@ -43,7 +43,6 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.SubcomposeAsyncImage
 import love.moonc.room.data.model.Room
 import love.moonc.room.data.model.User
-import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.components.RoomSpacing
 
 enum class MainTab {
@@ -53,7 +52,6 @@ enum class MainTab {
 
 @Composable
 fun MainScreen(
-    appContainer: AppContainer,
     selectedTab: MainTab,
     user: User?,
     homeViewModel: HomeViewModel,

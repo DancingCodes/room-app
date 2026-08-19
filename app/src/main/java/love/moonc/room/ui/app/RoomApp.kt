@@ -42,6 +42,15 @@ fun RoomApp(
         navController.navigate(Routes.Me) { launchSingleTop = true }
     }
 
+    LaunchedEffect(appState.user?.id) {
+        val userId = appState.user?.id
+        if (userId == null) {
+            homeViewModel.clear()
+        } else {
+            homeViewModel.loadForUser(userId)
+        }
+    }
+
     LaunchedEffect(appState.targetRoute) {
         val target = appState.targetRoute ?: return@LaunchedEffect
         navController.navigate(target) {
@@ -67,7 +76,6 @@ fun RoomApp(
             }
             composable(Routes.Home) {
                 MainScreen(
-                    appContainer = appContainer,
                     selectedTab = MainTab.Home,
                     user = appState.user,
                     homeViewModel = homeViewModel,
@@ -81,7 +89,6 @@ fun RoomApp(
             }
             composable(Routes.Me) {
                 MainScreen(
-                    appContainer = appContainer,
                     selectedTab = MainTab.Me,
                     user = appState.user,
                     homeViewModel = homeViewModel,
