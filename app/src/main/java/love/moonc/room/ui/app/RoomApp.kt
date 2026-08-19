@@ -42,10 +42,6 @@ fun RoomApp(
         navController.navigate(Routes.Me) { launchSingleTop = true }
     }
 
-    fun navigateEditProfile() {
-        if (navController.currentDestination?.route == Routes.EditProfile) return
-        navController.navigate(Routes.EditProfile) { launchSingleTop = true }
-    }
 
     LaunchedEffect(appState.user?.id) {
         val userId = appState.user?.id
@@ -88,7 +84,7 @@ fun RoomApp(
                     onMeTab = ::navigateMeTab,
                     onCreateRoom = { navController.navigate(Routes.CreateRoom) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
-                    onEditProfile = ::navigateEditProfile,
+                    onEditProfile = { navController.navigate(Routes.EditProfile) },
                     onLogout = { appViewModel.logout() },
                 )
             }
@@ -101,7 +97,7 @@ fun RoomApp(
                     onMeTab = ::navigateMeTab,
                     onCreateRoom = { navController.navigate(Routes.CreateRoom) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
-                    onEditProfile = ::navigateEditProfile,
+                    onEditProfile = { navController.navigate(Routes.EditProfile) },
                     onLogout = { appViewModel.logout() },
                 )
             }
