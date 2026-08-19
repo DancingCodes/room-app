@@ -36,17 +36,14 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.SubcomposeAsyncImage
 import love.moonc.room.data.model.Room
+import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
-import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.RoomSpacing
 
 enum class MainTab {
@@ -57,47 +54,35 @@ enum class MainTab {
 @Composable
 fun MainScreen(
     appContainer: AppContainer,
-    initialTab: MainTab = MainTab.Home,
+    selectedTab: MainTab,
+    user: User?,
+    homeViewModel: HomeViewModel,
+    onHomeTab: () -> Unit,
+    onMeTab: () -> Unit,
     onCreateRoom: () -> Unit,
     onRoomClick: (Long) -> Unit,
     onEditProfile: () -> Unit,
     onLogout: () -> Unit,
-    viewModel: MainViewModel = roomViewModel(appContainer),
 ) {
-    val state by viewModel.uiState.collectAsState()
-    var tab by remember { mutableStateOf(initialTab) }
-
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = tab == MainTab.Home,
-                    onClick = { tab = MainTab.Home },
-                    label = { Text("首页") },
-                    icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                )
-                NavigationBarItem(
-                    selected = tab == MainTab.Me,
-                    onClick = { tab = MainTab.Me },
-                    label = { Text("我的") },
-                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-                )
-            }
+            MainBottomBar(
+                selectedTab = selectedTab,
+                onHomeTab = onHomeTab,
+                onMeTab = onMeTab,
+            )
         },
     ) { padding ->
-        if (tab == MainTab.Home) {
-            HomeContent(
+        when (selectedTab) {
+            MainTab.Home -> HomeRouteContent(
                 modifier = Modifier.padding(padding),
-                state = state,
+                viewModel = homeViewModel,
                 onCreateRoom = onCreateRoom,
-                onRefresh = viewModel::refresh,
-                onLoadMore = viewModel::loadMoreRooms,
-                onJoinRoom = { roomId -> viewModel.joinRoom(roomId, onRoomClick) },
+                onRoomClick = onRoomClick,
             )
-        } else {
-            MeContent(
+            MainTab.Me -> MeContent(
                 modifier = Modifier.padding(padding),
-                state = state,
+                user = user,
                 onEditProfile = onEditProfile,
                 onLogout = onLogout,
             )
@@ -105,11 +90,52 @@ fun MainScreen(
     }
 }
 
+@Composable
+private fun HomeRouteContent(
+    modifier: Modifier,
+    viewModel: HomeViewModel,
+    onCreateRoom: () -> Unit,
+    onRoomClick: (Long) -> Unit,
+) {
+    val state by viewModel.uiState.collectAsState()
+
+    HomeContent(
+        modifier = modifier,
+        state = state,
+        onCreateRoom = onCreateRoom,
+        onRefresh = viewModel::refresh,
+        onLoadMore = viewModel::loadMoreRooms,
+        onJoinRoom = { roomId -> viewModel.joinRoom(roomId, onRoomClick) },
+    )
+}
+
+@Composable
+private fun MainBottomBar(
+    selectedTab: MainTab,
+    onHomeTab: () -> Unit,
+    onMeTab: () -> Unit,
+) {
+    NavigationBar {
+        NavigationBarItem(
+            selected = selectedTab == MainTab.Home,
+            onClick = onHomeTab,
+            label = { Text("首页") },
+            icon = { Icon(Icons.Filled.Home, contentDescription = null) },
+        )
+        NavigationBarItem(
+            selected = selectedTab == MainTab.Me,
+            onClick = onMeTab,
+            label = { Text("我的") },
+            icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
     modifier: Modifier,
-    state: MainUiState,
+    state: HomeUiState,
     onCreateRoom: () -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
@@ -228,11 +254,10 @@ private fun RoomItem(
 @Composable
 private fun MeContent(
     modifier: Modifier,
-    state: MainUiState,
+    user: User?,
     onEditProfile: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    val user = state.user
     Column(
         modifier = modifier
             .fillMaxSize()

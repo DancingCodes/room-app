@@ -1,4 +1,4 @@
-package love.moonc.room.ui.profile
+﻿package love.moonc.room.ui.profile
 
 import android.content.Context
 import android.net.Uri
@@ -17,7 +17,6 @@ import love.moonc.room.ui.message.MessageCenter
 
 data class ProfileUiState(
     val loading: Boolean = false,
-    val user: User? = null,
 )
 
 class ProfileViewModel(
@@ -27,23 +26,9 @@ class ProfileViewModel(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
-    init {
-        load()
-    }
-
-    fun load() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true)
-            runCatching { api.me().requireData().user }
-                .onSuccess { user -> _uiState.value = ProfileUiState(user = user) }
-                .onFailure { error ->
-                    _uiState.value = ProfileUiState()
-                    messageCenter.show(error.userMessage())
-                }
-        }
-    }
-
     fun save(context: Context, nickname: String, avatarUri: Uri?, onSaved: (User) -> Unit) {
+        if (_uiState.value.loading) return
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
@@ -52,7 +37,7 @@ class ProfileViewModel(
                 }
                 api.updateMe(UpdateMeRequest(nickname.trim(), avatarUrl)).requireData().user
             }.onSuccess { user ->
-                _uiState.value = ProfileUiState(user = user)
+                _uiState.value = ProfileUiState()
                 onSaved(user)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(loading = false)

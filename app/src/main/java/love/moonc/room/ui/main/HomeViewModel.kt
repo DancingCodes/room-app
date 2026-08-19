@@ -1,4 +1,4 @@
-package love.moonc.room.ui.main
+﻿package love.moonc.room.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,27 +9,25 @@ import love.moonc.room.core.network.requireData
 import love.moonc.room.core.network.userMessage
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.Room
-import love.moonc.room.data.model.User
 import love.moonc.room.ui.message.MessageCenter
 
-data class MainUiState(
+data class HomeUiState(
     val loading: Boolean = false,
     val loadingMore: Boolean = false,
     val joiningRoomId: Long? = null,
     val rooms: List<Room> = emptyList(),
-    val user: User? = null,
     val page: Int = 0,
     val pageSize: Int = 20,
     val total: Int = 0,
     val hasMore: Boolean = false,
 )
 
-class MainViewModel(
+class HomeViewModel(
     private val api: RoomApi,
     private val messageCenter: MessageCenter,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MainUiState())
-    val uiState: StateFlow<MainUiState> = _uiState
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState
 
     init {
         refresh()
@@ -39,13 +37,10 @@ class MainViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
-                val roomPayload = api.rooms(page = 1, pageSize = _uiState.value.pageSize).requireData()
-                val user = api.me().requireData().user
-                roomPayload to user
-            }.onSuccess { (roomPayload, user) ->
-                _uiState.value = MainUiState(
+                api.rooms(page = 1, pageSize = _uiState.value.pageSize).requireData()
+            }.onSuccess { roomPayload ->
+                _uiState.value = HomeUiState(
                     rooms = roomPayload.list,
-                    user = user,
                     page = roomPayload.page,
                     pageSize = roomPayload.pageSize,
                     total = roomPayload.total,

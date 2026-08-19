@@ -1,4 +1,4 @@
-﻿package love.moonc.room.ui.app
+package love.moonc.room.ui.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.auth.LoginScreen
+import love.moonc.room.ui.main.HomeViewModel
 import love.moonc.room.ui.main.MainScreen
 import love.moonc.room.ui.main.MainTab
 import love.moonc.room.ui.message.CenterMessageHost
@@ -29,8 +30,17 @@ fun RoomApp(
     appContainer: AppContainer,
     navController: NavHostController = rememberNavController(),
     appViewModel: AppViewModel = roomViewModel(appContainer),
+    homeViewModel: HomeViewModel = roomViewModel(appContainer),
 ) {
     val appState by appViewModel.uiState.collectAsState()
+
+    fun navigateHomeTab() {
+        navController.navigate(Routes.Home) { launchSingleTop = true }
+    }
+
+    fun navigateMeTab() {
+        navController.navigate(Routes.Me) { launchSingleTop = true }
+    }
 
     LaunchedEffect(appState.targetRoute) {
         val target = appState.targetRoute ?: return@LaunchedEffect
@@ -55,18 +65,14 @@ fun RoomApp(
                     onLoginSuccess = { user -> appViewModel.setUser(user) },
                 )
             }
-            composable(Routes.Main) {
-                MainScreen(
-                    appContainer = appContainer,
-                    onCreateRoom = { navController.navigate(Routes.CreateRoom) },
-                    onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
-                    onEditProfile = { navController.navigate(Routes.EditProfile) },
-                    onLogout = { appViewModel.logout() },
-                )
-            }
             composable(Routes.Home) {
                 MainScreen(
                     appContainer = appContainer,
+                    selectedTab = MainTab.Home,
+                    user = appState.user,
+                    homeViewModel = homeViewModel,
+                    onHomeTab = ::navigateHomeTab,
+                    onMeTab = ::navigateMeTab,
                     onCreateRoom = { navController.navigate(Routes.CreateRoom) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
                     onEditProfile = { navController.navigate(Routes.EditProfile) },
@@ -76,7 +82,11 @@ fun RoomApp(
             composable(Routes.Me) {
                 MainScreen(
                     appContainer = appContainer,
-                    initialTab = MainTab.Me,
+                    selectedTab = MainTab.Me,
+                    user = appState.user,
+                    homeViewModel = homeViewModel,
+                    onHomeTab = ::navigateHomeTab,
+                    onMeTab = ::navigateMeTab,
                     onCreateRoom = { navController.navigate(Routes.CreateRoom) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
                     onEditProfile = { navController.navigate(Routes.EditProfile) },
@@ -84,17 +94,14 @@ fun RoomApp(
                 )
             }
             composable(Routes.EditProfile) {
-                fun navigateBack() {
-                    navController.popBackStack()
-                }
-
                 EditProfileScreen(
                     appContainer = appContainer,
+                    user = appState.user,
                     onSaved = { user ->
                         appViewModel.updateUser(user)
-                        navigateBack()
+                        navController.popBackStack()
                     },
-                    onBack = { navigateBack() },
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(Routes.CreateRoom) {

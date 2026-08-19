@@ -1,4 +1,4 @@
-package love.moonc.room.ui.app
+﻿package love.moonc.room.ui.app
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.auth.AuthViewModel
-import love.moonc.room.ui.main.MainViewModel
+import love.moonc.room.ui.main.HomeViewModel
 import love.moonc.room.ui.profile.ProfileViewModel
 import love.moonc.room.ui.room.CreateRoomViewModel
 import love.moonc.room.ui.room.RoomDetailViewModel
@@ -24,7 +24,7 @@ class RoomViewModelFactory(
         return when (modelClass) {
             AppViewModel::class.java -> AppViewModel(appContainer.roomApi, appContainer.tokenStore)
             AuthViewModel::class.java -> AuthViewModel(appContainer.roomApi, appContainer.tokenStore, appContainer.messageCenter)
-            MainViewModel::class.java -> MainViewModel(appContainer.roomApi, appContainer.messageCenter)
+            HomeViewModel::class.java -> HomeViewModel(appContainer.roomApi, appContainer.messageCenter)
             ProfileViewModel::class.java -> ProfileViewModel(appContainer.roomApi, appContainer.messageCenter)
             CreateRoomViewModel::class.java -> CreateRoomViewModel(appContainer.roomApi, appContainer.messageCenter)
             RoomDetailViewModel::class.java -> RoomDetailViewModel(

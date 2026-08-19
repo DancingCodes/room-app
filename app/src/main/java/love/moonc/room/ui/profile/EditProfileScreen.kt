@@ -1,4 +1,4 @@
-package love.moonc.room.ui.profile
+﻿package love.moonc.room.ui.profile
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -25,19 +25,21 @@ import love.moonc.room.ui.components.PrimaryButton
 @Composable
 fun EditProfileScreen(
     appContainer: AppContainer,
+    user: User?,
     onSaved: (User) -> Unit,
     onBack: () -> Unit,
     viewModel: ProfileViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var nickname by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf(user?.nickname.orEmpty()) }
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
     BackHandler(onBack = onBack)
 
-    LaunchedEffect(state.user?.id) {
-        state.user?.let { nickname = it.nickname }
+    LaunchedEffect(user?.id) {
+        nickname = user?.nickname.orEmpty()
+        avatarUri = null
     }
 
     FormColumn(
@@ -46,7 +48,7 @@ fun EditProfileScreen(
     ) {
         AvatarPicker(
             avatarUri = avatarUri,
-            avatarUrl = state.user?.avatarUrl,
+            avatarUrl = user?.avatarUrl,
             uploading = state.loading,
             onAvatarSelected = { uri -> avatarUri = uri },
         )
@@ -55,6 +57,7 @@ fun EditProfileScreen(
         PrimaryButton(
             text = "保存",
             loading = state.loading,
+            enabled = user != null,
             onClick = { viewModel.save(context, nickname, avatarUri, onSaved) },
         )
     }

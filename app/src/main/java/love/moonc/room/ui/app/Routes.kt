@@ -1,9 +1,8 @@
-package love.moonc.room.ui.app
+﻿package love.moonc.room.ui.app
 
 object Routes {
     const val Splash = "splash"
     const val Login = "login"
-    const val Main = "main"
     const val Home = "main/home"
     const val Me = "main/me"
     const val EditProfile = "profile/edit"

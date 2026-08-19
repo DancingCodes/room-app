@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -62,7 +61,6 @@ fun AvatarPicker(
                 contentAlignment = Alignment.Center,
             ) {
                 when {
-                    uploading -> CircularProgressIndicator(modifier = Modifier.size(RoomSpacing.SectionGap + RoomSpacing.CompactGap))
                     avatarUri != null -> AsyncImage(
                         model = avatarUri,
                         contentDescription = "头像",
