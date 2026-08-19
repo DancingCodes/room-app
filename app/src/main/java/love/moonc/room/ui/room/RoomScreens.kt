@@ -1,24 +1,33 @@
 package love.moonc.room.ui.room
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,8 +39,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
+import love.moonc.room.data.model.RoomMember
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.FormColumn
@@ -61,6 +76,7 @@ fun CreateRoomScreen(
                 label = { Text("8人房") },
             )
         }
+        Spacer(Modifier.weight(1f))
         PrimaryButton("创建", state.loading, { viewModel.create(onCreated) })
     }
 }
@@ -70,6 +86,7 @@ fun RoomDetailScreen(
     appContainer: AppContainer,
     roomId: Long,
     onLeft: (String?) -> Unit,
+    currentUserId: Long? = null,
     viewModel: RoomDetailViewModel = roomViewModel(appContainer),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -140,55 +157,15 @@ fun RoomDetailScreen(
             return@ScreenColumn
         }
 
-        val currentMember = detail.members.firstOrNull()
-        Card(
+        Text(
+            text = detail.room.name,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            ),
-        ) {
-            Column(
-                modifier = Modifier.padding(RoomSpacing.CardPadding),
-                verticalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap)) {
-                    Text(
-                        text = "${detail.room.currentMembers} / ${detail.room.maxMembers} 人",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (currentMember != null) {
-                        Text("我的麦克风")
-                        Switch(
-                            checked = currentMember.micStatus == "on",
-                            onCheckedChange = { checked ->
-                                viewModel.updateMic(roomId, if (checked) "on" else "off")
-                            },
-                        )
-                    }
-                }
-                Text("成员", style = MaterialTheme.typography.titleSmall)
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().heightIn(max = RoomSpacing.AvatarSize * 2),
-                    verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
-                ) {
-                    items(detail.members, key = { it.userId }) { member ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
-                        ) {
-                            Text(member.nickname, modifier = Modifier.weight(1f))
-                            if (member.isOwner) Text("房主")
-                            Text(if (member.micStatus == "on") "麦克风开" else "麦克风关")
-                        }
-                    }
-                }
-            }
-        }
+        )
 
-        Text("消息", style = MaterialTheme.typography.titleMedium)
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
         ) {
             if (state.hasOlderMessages) {
@@ -202,14 +179,30 @@ fun RoomDetailScreen(
                     }
                 }
             }
-            items(state.messages, key = { it.id }) { message ->
-                Text(
-                    text = "${message.senderNickname}: ${message.content}",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+            if (state.messages.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text("暂无消息", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            } else {
+                items(state.messages, key = { it.id }) { message ->
+                    Text(
+                        text = "${message.senderNickname}: ${message.content}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap)) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             OutlinedTextField(
                 value = state.input,
                 onValueChange = viewModel::updateInput,
@@ -223,6 +216,145 @@ fun RoomDetailScreen(
             ) {
                 Text("发送")
             }
+        }
+
+        MemberAvatarRow(
+            members = detail.members,
+            maxMembers = detail.room.maxMembers,
+            currentUserId = currentUserId,
+            onToggleMic = { member ->
+                viewModel.updateMic(roomId, if (member.micStatus == "on") "off" else "on")
+            },
+        )
+    }
+}
+
+@Composable
+private fun MemberAvatarRow(
+    members: List<RoomMember>,
+    maxMembers: Int,
+    currentUserId: Long?,
+    onToggleMic: (RoomMember) -> Unit,
+) {
+    val slotCount = maxOf(maxMembers, members.size)
+    val slots = List(slotCount) { index -> members.getOrNull(index) }
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(RoomSpacing.ItemGap),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        items(slots.size, key = { it }) { index ->
+            val member = slots[index]
+            MemberAvatarItem(
+                member = member,
+                canToggleMic = member?.userId == currentUserId,
+                onToggleMic = onToggleMic,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MemberAvatarItem(
+    member: RoomMember?,
+    canToggleMic: Boolean,
+    onToggleMic: (RoomMember) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .width(RoomSpacing.MemberAvatarSize + RoomSpacing.ItemGap)
+            .clickable(enabled = canToggleMic && member != null) {
+                member?.let(onToggleMic)
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(RoomSpacing.CompactGap),
+    ) {
+        Box(modifier = Modifier.size(RoomSpacing.MemberAvatarSize)) {
+            AvatarSlot(member = member)
+            if (member != null) {
+                MicStatusBadge(
+                    micOn = member.micStatus == "on",
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                )
+            }
+        }
+        Text(
+            text = when {
+                member == null -> "空位"
+                member.isOwner -> "${member.nickname} · 房主"
+                else -> member.nickname
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = if (member == null) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun AvatarSlot(member: RoomMember?) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(CircleShape),
+        shape = CircleShape,
+        color = if (member == null) {
+            MaterialTheme.colorScheme.surfaceContainerHighest
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        },
+        contentColor = if (member == null) {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        } else {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        },
+        tonalElevation = RoomSpacing.CompactGap / 4,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (member?.avatarUrl?.isNotBlank() == true) {
+                AsyncImage(
+                    model = member.avatarUrl,
+                    contentDescription = "头像",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Icon(Icons.Filled.Person, contentDescription = "头像")
+            }
+        }
+    }
+}
+
+@Composable
+private fun MicStatusBadge(
+    micOn: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(RoomSpacing.MicStatusBadgeSize),
+        shape = CircleShape,
+        color = if (micOn) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (micOn) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+        tonalElevation = RoomSpacing.CompactGap / 2,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = if (micOn) Icons.Filled.Mic else Icons.Filled.MicOff,
+                contentDescription = if (micOn) "麦克风开" else "麦克风关",
+                modifier = Modifier.size(RoomSpacing.MicStatusIconSize),
+            )
         }
     }
 }

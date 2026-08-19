@@ -2,6 +2,7 @@ package love.moonc.room.ui.profile
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,13 +11,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import love.moonc.room.data.model.User
 import love.moonc.room.di.AppContainer
 import love.moonc.room.ui.app.roomViewModel
 import love.moonc.room.ui.components.AvatarPicker
-import love.moonc.room.ui.components.CenteredFormColumn
+import love.moonc.room.ui.components.FormColumn
 import love.moonc.room.ui.components.FormTextField
 import love.moonc.room.ui.components.PrimaryButton
 
@@ -38,7 +40,10 @@ fun EditProfileScreen(
         state.user?.let { nickname = it.nickname }
     }
 
-    CenteredFormColumn(Modifier.fillMaxSize()) {
+    FormColumn(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         AvatarPicker(
             avatarUri = avatarUri,
             avatarUrl = state.user?.avatarUrl,
@@ -46,6 +51,7 @@ fun EditProfileScreen(
             onAvatarSelected = { uri -> avatarUri = uri },
         )
         FormTextField(nickname, { nickname = it }, "昵称")
+        Spacer(Modifier.weight(1f))
         PrimaryButton(
             text = "保存",
             loading = state.loading,

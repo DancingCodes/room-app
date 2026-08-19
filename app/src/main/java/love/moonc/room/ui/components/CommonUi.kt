@@ -43,6 +43,9 @@ object RoomSpacing {
     val FieldMinHeight = 56.dp
     val ButtonLoadingSize = 20.dp
     val AvatarSize = 88.dp
+    val MemberAvatarSize = 56.dp
+    val MicStatusIconSize = 14.dp
+    val MicStatusBadgeSize = 22.dp
     val ContentMaxWidth = 420.dp
     val SwipeLeaveThreshold = 96.dp
 }

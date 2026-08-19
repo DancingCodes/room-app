@@ -119,6 +119,7 @@ fun RoomApp(
                         appContainer.messageCenter.show(message)
                         navController.navigate(Routes.Home) { popUpTo(0) }
                     },
+                    currentUserId = appState.user?.id,
                 )
             }
         }
