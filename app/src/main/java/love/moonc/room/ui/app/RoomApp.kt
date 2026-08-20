@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.flow.collect
+import love.moonc.room.core.network.SessionExpiredCenter
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -58,6 +60,7 @@ fun RoomApp(
         if (userId == null) {
             homeViewModel.clear()
         } else {
+            SessionExpiredCenter.reset()
             homeViewModel.loadForUser(userId)
         }
     }
@@ -69,6 +72,13 @@ fun RoomApp(
             launchSingleTop = true
         }
         appViewModel.clearNavigationTarget()
+    }
+
+    LaunchedEffect(SessionExpiredCenter) {
+        SessionExpiredCenter.events.collect {
+            appContainer.messageCenter.show("登录已过期，请重新登录")
+            appViewModel.logout()
+        }
     }
 
     Box(Modifier.fillMaxSize()) {
