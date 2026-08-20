@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import love.moonc.room.BuildConfig
 import love.moonc.room.core.network.ApiException
 import love.moonc.room.core.update.ApkDownloader
@@ -40,15 +41,16 @@ class UpdateViewModel(
         _uiState.value = UpdateUiState(checking = true)
         viewModelScope.launch {
             runCatching {
-                val response = api.latestAppVersion()
+                val response = withTimeout(10_000) { api.latestAppVersion() }
                 if (response.code != 200) throw ApiException(response.code, response.message)
                 response.data
             }.onSuccess { version ->
                 _uiState.value = UpdateUiState(
+                    checking = false,
                     update = version?.takeIf { it.versionCode > BuildConfig.VERSION_CODE },
                 )
             }.onFailure { error ->
-                _uiState.value = UpdateUiState(error = error.message ?: "检查更新失败")
+                _uiState.value = UpdateUiState(checking = false, error = error.message ?: "检查更新失败")
             }
         }
     }

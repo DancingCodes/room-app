@@ -34,10 +34,13 @@ fun ForceUpdateScreen(
     CenteredFormColumn(
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("需要更新", style = MaterialTheme.typography.headlineMedium)
         val update = state.update
         if (update == null) {
-            Text(state.error ?: "正在检查更新")
+            Text(
+                if (state.error == null) "正在检查更新" else "检查更新失败",
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(state.error ?: "请稍候")
             Spacer(Modifier.height(12.dp))
             PrimaryButton(
                 text = "重新检查",
