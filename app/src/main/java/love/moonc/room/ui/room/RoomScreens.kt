@@ -26,8 +26,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -112,26 +112,38 @@ fun RoomDetailScreen(
     }
 
     BackHandler(enabled = showLeaveConfirm) {
-        showLeaveConfirm = false
+        if (!state.leaving) {
+            showLeaveConfirm = false
+        }
     }
 
     if (showLeaveConfirm) {
         AlertDialog(
-            onDismissRequest = { showLeaveConfirm = false },
+            onDismissRequest = {
+                if (!state.leaving) {
+                    showLeaveConfirm = false
+                }
+            },
             title = { Text("离开房间？") },
             text = { Text("确定要离开当前房间吗？") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showLeaveConfirm = false
-                        viewModel.leave(roomId) { onLeft(null) }
+                        viewModel.leave(roomId) {
+                            showLeaveConfirm = false
+                            onLeft(null)
+                        }
                     },
+                    enabled = !state.leaving,
                 ) {
-                    Text("离开")
+                    Text(if (state.leaving) "离开中" else "离开")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showLeaveConfirm = false }) {
+                TextButton(
+                    onClick = { showLeaveConfirm = false },
+                    enabled = !state.leaving,
+                ) {
                     Text("取消")
                 }
             },
@@ -221,7 +233,7 @@ fun RoomDetailScreen(
                 modifier = Modifier.weight(1f),
                 singleLine = true,
             )
-            IconButton(
+            FilledIconButton(
                 onClick = { viewModel.sendMessage(roomId) },
                 enabled = state.input.isNotBlank(),
                 modifier = Modifier.size(RoomSpacing.FieldMinHeight),

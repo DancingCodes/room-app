@@ -71,6 +71,7 @@ data class RoomDetailUiState(
     val messages: List<Message> = emptyList(),
     val hasOlderMessages: Boolean = false,
     val input: String = "",
+    val leaving: Boolean = false,
     val disconnected: Boolean = false,
 )
 
@@ -171,10 +172,14 @@ class RoomDetailViewModel(
     }
 
     fun leave(roomId: Long, onLeft: () -> Unit) {
+        if (_uiState.value.leaving) return
+
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(leaving = true)
             runCatching { api.leaveRoom(roomId).requireSuccess() }
                 .onSuccess { onLeft() }
                 .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(leaving = false)
                     messageCenter.show(error.userMessage())
                 }
         }

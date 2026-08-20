@@ -34,12 +34,22 @@ fun RoomApp(
 ) {
     val appState by appViewModel.uiState.collectAsState()
 
+    fun navigateMainTab(route: String) {
+        navController.navigate(route) {
+            popUpTo(Routes.Home) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     fun navigateHomeTab() {
-        navController.navigate(Routes.Home) { launchSingleTop = true }
+        navigateMainTab(Routes.Home)
     }
 
     fun navigateMeTab() {
-        navController.navigate(Routes.Me) { launchSingleTop = true }
+        navigateMainTab(Routes.Me)
     }
 
 
