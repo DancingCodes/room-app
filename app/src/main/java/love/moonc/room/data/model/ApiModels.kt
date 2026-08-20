@@ -88,6 +88,12 @@ data class RoomDetail(
 )
 
 @Serializable
+data class RtcTokenPayload(
+    val token: String,
+    @SerialName("expires_at")
+    val expiresAt: String,
+)
+@Serializable
 data class RoomListPayload(
     val list: List<Room>,
     val total: Int,

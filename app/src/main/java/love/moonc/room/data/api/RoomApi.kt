@@ -12,6 +12,7 @@ import love.moonc.room.data.model.MessageListPayload
 import love.moonc.room.data.model.MessagePayload
 import love.moonc.room.data.model.RoomDetail
 import love.moonc.room.data.model.RoomListPayload
+import love.moonc.room.data.model.RtcTokenPayload
 import love.moonc.room.data.model.UpdateMeRequest
 import love.moonc.room.data.model.UpdateMicRequest
 import love.moonc.room.data.model.UserPayload
@@ -58,6 +59,8 @@ interface RoomApi {
     @GET("api/v1/rooms/{room_id}")
     suspend fun roomDetail(@Path("room_id") roomId: Long): ApiResponse<RoomDetail>
 
+    @GET("api/v1/rooms/{room_id}/rtc-token")
+    suspend fun rtcToken(@Path("room_id") roomId: Long): ApiResponse<RtcTokenPayload>
     @POST("api/v1/rooms/{room_id}/join")
     suspend fun joinRoom(@Path("room_id") roomId: Long): ApiResponse<RoomDetail>
 

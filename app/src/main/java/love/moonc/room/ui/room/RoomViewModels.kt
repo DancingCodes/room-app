@@ -104,8 +104,7 @@ class RoomDetailViewModel(
                     messages = messages,
                     hasOlderMessages = messages.size >= messagePageSize,
                 )
-                runCatching { voiceClient.join(roomId, currentUserId) }
-                    .onFailure { messageCenter.show("语音连接失败") }
+                joinVoice(roomId, currentUserId)
                 connectSocket(roomId)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(loading = false)
@@ -114,6 +113,31 @@ class RoomDetailViewModel(
         }
     }
 
+    private fun joinVoice(roomId: Long, currentUserId: Long) {
+        viewModelScope.launch {
+            runCatching { api.rtcToken(roomId).requireData().token }
+                .onSuccess { token ->
+                    runCatching {
+                        voiceClient.join(roomId, currentUserId, token) {
+                            refreshVoiceToken(roomId)
+                        }
+                    }.onFailure {
+                        messageCenter.show("语音连接失败")
+                    }
+                }
+                .onFailure {
+                    messageCenter.show("语音连接失败")
+                }
+        }
+    }
+
+    private fun refreshVoiceToken(roomId: Long) {
+        viewModelScope.launch {
+            runCatching { api.rtcToken(roomId).requireData().token }
+                .onSuccess(voiceClient::renewToken)
+                .onFailure { messageCenter.show("语音 Token 刷新失败") }
+        }
+    }
     fun updateInput(value: String) {
         _uiState.value = _uiState.value.copy(input = value)
     }
