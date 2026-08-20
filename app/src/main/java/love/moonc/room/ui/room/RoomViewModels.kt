@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import love.moonc.room.core.network.requireData
+import love.moonc.room.core.voice.AgoraVoiceClient
 import love.moonc.room.core.network.requireSuccess
 import love.moonc.room.core.network.userMessage
 import love.moonc.room.data.api.RoomApi
@@ -80,6 +81,7 @@ class RoomDetailViewModel(
     private val api: RoomApi,
     private val tokenStore: TokenStore,
     private val socketFactory: RoomSocketFactory,
+    private val voiceClient: AgoraVoiceClient,
     private val messageCenter: MessageCenter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoomDetailUiState())
@@ -89,7 +91,7 @@ class RoomDetailViewModel(
     private var closingByUser = false
     private val messagePageSize = 20
 
-    fun load(roomId: Long) {
+    fun load(roomId: Long, currentUserId: Long) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             runCatching {
@@ -102,6 +104,8 @@ class RoomDetailViewModel(
                     messages = messages,
                     hasOlderMessages = messages.size >= messagePageSize,
                 )
+                runCatching { voiceClient.join(roomId, currentUserId) }
+                    .onFailure { messageCenter.show("语音连接失败") }
                 connectSocket(roomId)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(loading = false)
@@ -155,6 +159,7 @@ class RoomDetailViewModel(
         viewModelScope.launch {
             runCatching { api.updateMic(roomId, UpdateMicRequest(micStatus)).requireData().member }
                 .onSuccess { member ->
+                    voiceClient.setMicrophoneEnabled(member.micStatus == "on")
                     val detail = _uiState.value.detail ?: return@onSuccess
                     _uiState.value = _uiState.value.copy(
                         detail = detail.copy(
@@ -178,6 +183,7 @@ class RoomDetailViewModel(
             runCatching { api.leaveRoom(roomId).requireSuccess() }
                 .onSuccess {
                     closeSocketAfterLeave()
+                    voiceClient.leave()
                     onLeft()
                 }
                 .onFailure { error ->
@@ -300,10 +306,12 @@ class RoomDetailViewModel(
     }
 
     private fun handleSocketUnauthorized() {
+        voiceClient.leave()
         _uiState.value = _uiState.value.copy(unauthorized = true)
     }
 
     private fun handleSocketDisconnected() {
+        voiceClient.leave()
         _uiState.value = _uiState.value.copy(disconnected = true)
     }
 
@@ -317,6 +325,7 @@ class RoomDetailViewModel(
         closingByUser = true
         webSocket?.close(1000, "view model cleared")
         webSocket = null
+        voiceClient.leave()
         super.onCleared()
     }
 }

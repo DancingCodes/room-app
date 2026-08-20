@@ -12,6 +12,7 @@ okhttp = "5.4.0"
 kotlinxSerializationJson = "1.11.0"
 retrofitKotlinxSerialization = "1.0.0"
 coil = "2.7.0"
+agoraRtc = "4.6.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,7 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerialization" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+agora-rtc = { group = "io.agora.rtc", name = "full-rtc-basic", version.ref = "agoraRtc" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

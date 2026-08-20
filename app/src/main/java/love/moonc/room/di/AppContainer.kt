@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import love.moonc.room.core.network.NetworkConfig
 import love.moonc.room.core.update.ApkDownloader
+import love.moonc.room.core.voice.AgoraVoiceClient
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.storage.TokenStore
 import love.moonc.room.data.websocket.RoomSocketFactory
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit
 
 class AppContainer(context: Context) {
     val tokenStore: TokenStore = TokenStore(context.applicationContext)
+    val agoraVoiceClient: AgoraVoiceClient = AgoraVoiceClient(context.applicationContext)
     val messageCenter: MessageCenter = MessageCenter()
 
     private val json = Json {

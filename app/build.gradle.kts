@@ -56,5 +56,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.coil.compose)
+    implementation(libs.agora.rtc)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

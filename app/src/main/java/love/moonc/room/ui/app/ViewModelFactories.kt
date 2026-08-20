@@ -33,6 +33,7 @@ class RoomViewModelFactory(
                 appContainer.roomApi,
                 appContainer.tokenStore,
                 appContainer.roomSocketFactory,
+                appContainer.agoraVoiceClient,
                 appContainer.messageCenter,
             )
             else -> error("Unknown ViewModel class: ${modelClass.name}")

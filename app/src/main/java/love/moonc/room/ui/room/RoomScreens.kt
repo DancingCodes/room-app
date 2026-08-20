@@ -1,6 +1,10 @@
 package love.moonc.room.ui.room
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +49,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
@@ -95,11 +101,19 @@ fun RoomDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val detail = state.detail
+    val context = LocalContext.current
+    val requestMicrophonePermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            viewModel.updateMic(roomId, "on")
+        } else {
+            appContainer.messageCenter.show("未授予录音权限")
+        }
+    }
     val leaveThresholdPx = with(LocalDensity.current) { RoomSpacing.SwipeLeaveThreshold.toPx() }
     var showLeaveConfirm by remember { mutableStateOf(false) }
 
-    LaunchedEffect(roomId) {
-        viewModel.load(roomId)
+    LaunchedEffect(roomId, currentUserId) {
+        currentUserId?.let { userId -> viewModel.load(roomId, userId) }
     }
 
     LaunchedEffect(state.disconnected) {
@@ -254,7 +268,13 @@ fun RoomDetailScreen(
             maxMembers = detail.room.maxMembers,
             currentUserId = currentUserId,
             onToggleMic = { member ->
-                viewModel.updateMic(roomId, if (member.micStatus == "on") "off" else "on")
+                if (member.micStatus == "on") {
+                    viewModel.updateMic(roomId, "off")
+                } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    viewModel.updateMic(roomId, "on")
+                } else {
+                    requestMicrophonePermission.launch(Manifest.permission.RECORD_AUDIO)
+                }
             },
         )
     }
