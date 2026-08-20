@@ -145,6 +145,10 @@ fun RoomApp(
                         homeViewModel.refresh()
                         navController.navigate(Routes.Home) { popUpTo(0) }
                     },
+                    onUnauthorized = {
+                        appContainer.messageCenter.show("登录已过期，请重新登录")
+                        appViewModel.logout()
+                    },
                     currentUserId = appState.user?.id,
                 )
             }

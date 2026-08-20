@@ -89,6 +89,7 @@ fun RoomDetailScreen(
     appContainer: AppContainer,
     roomId: Long,
     onLeft: (String?) -> Unit,
+    onUnauthorized: () -> Unit,
     currentUserId: Long? = null,
     viewModel: RoomDetailViewModel = roomViewModel(appContainer),
 ) {
@@ -104,6 +105,12 @@ fun RoomDetailScreen(
     LaunchedEffect(state.disconnected) {
         if (state.disconnected) {
             onLeft("连接已断开，已离开房间")
+        }
+    }
+
+    LaunchedEffect(state.unauthorized) {
+        if (state.unauthorized) {
+            onUnauthorized()
         }
     }
 

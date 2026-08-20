@@ -73,6 +73,7 @@ data class RoomDetailUiState(
     val input: String = "",
     val leaving: Boolean = false,
     val disconnected: Boolean = false,
+    val unauthorized: Boolean = false,
 )
 
 class RoomDetailViewModel(
@@ -201,7 +202,11 @@ class RoomDetailViewModel(
                     }
 
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                        handleSocketDisconnected()
+                        if (response?.code == 401) {
+                            handleSocketUnauthorized()
+                        } else {
+                            handleSocketDisconnected()
+                        }
                     }
 
                     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
@@ -289,6 +294,10 @@ class RoomDetailViewModel(
                 },
             ),
         )
+    }
+
+    private fun handleSocketUnauthorized() {
+        _uiState.value = _uiState.value.copy(unauthorized = true)
     }
 
     private fun handleSocketDisconnected() {
