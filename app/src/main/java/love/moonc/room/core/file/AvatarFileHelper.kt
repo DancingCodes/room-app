@@ -1,4 +1,4 @@
-package love.moonc.room.core.file
+﻿package love.moonc.room.core.file
 
 import android.content.Context
 import android.net.Uri

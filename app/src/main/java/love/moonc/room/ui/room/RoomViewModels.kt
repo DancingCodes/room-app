@@ -118,12 +118,9 @@ class RoomDetailViewModel(
         if (content.isEmpty()) return
 
         viewModelScope.launch {
-            runCatching { api.createMessage(roomId, CreateMessageRequest(content)).requireData().message }
-                .onSuccess { message ->
-                    _uiState.value = _uiState.value.copy(
-                        input = "",
-                        messages = (_uiState.value.messages + message).distinctBy { it.id }.sortedBy { it.id },
-                    )
+            runCatching { api.createMessage(roomId, CreateMessageRequest(content)).requireData() }
+                .onSuccess {
+                    _uiState.value = _uiState.value.copy(input = "")
                 }
                 .onFailure { error ->
                     messageCenter.show(error.userMessage())
