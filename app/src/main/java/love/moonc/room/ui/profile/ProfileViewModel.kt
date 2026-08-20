@@ -1,4 +1,4 @@
-﻿package love.moonc.room.ui.profile
+package love.moonc.room.ui.profile
 
 import android.content.Context
 import android.net.Uri
@@ -26,7 +26,13 @@ class ProfileViewModel(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
-    fun save(context: Context, nickname: String, avatarUri: Uri?, onSaved: (User) -> Unit) {
+    fun save(
+        context: Context,
+        nickname: String,
+        currentAvatarUrl: String,
+        avatarUri: Uri?,
+        onSaved: (User) -> Unit,
+    ) {
         if (_uiState.value.loading) return
 
         viewModelScope.launch {
@@ -34,7 +40,7 @@ class ProfileViewModel(
             runCatching {
                 val avatarUrl = avatarUri?.let { uri ->
                     api.uploadImage(uri.toImagePart(context)).requireData().url
-                }
+                } ?: currentAvatarUrl
                 api.updateMe(UpdateMeRequest(nickname.trim(), avatarUrl)).requireData().user
             }.onSuccess { user ->
                 _uiState.value = ProfileUiState()

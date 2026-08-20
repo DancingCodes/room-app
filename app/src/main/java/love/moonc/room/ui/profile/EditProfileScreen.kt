@@ -58,7 +58,11 @@ fun EditProfileScreen(
             text = "保存",
             loading = state.loading,
             enabled = user != null,
-            onClick = { viewModel.save(context, nickname, avatarUri, onSaved) },
+            onClick = {
+                user?.let {
+                    viewModel.save(context, nickname, it.avatarUrl, avatarUri, onSaved)
+                }
+            },
         )
     }
 }

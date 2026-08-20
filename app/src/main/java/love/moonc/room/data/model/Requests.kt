@@ -19,7 +19,7 @@ data class EmailLoginRequest(
 data class UpdateMeRequest(
     val nickname: String,
     @SerialName("avatar_url")
-    val avatarUrl: String? = null,
+    val avatarUrl: String,
 )
 
 @Serializable

@@ -86,6 +86,7 @@ class RoomDetailViewModel(
     val uiState: StateFlow<RoomDetailUiState> = _uiState
     private val json = Json { ignoreUnknownKeys = true }
     private var webSocket: WebSocket? = null
+    private var closingByUser = false
     private val messagePageSize = 20
 
     fun load(roomId: Long) {
@@ -175,7 +176,10 @@ class RoomDetailViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(leaving = true)
             runCatching { api.leaveRoom(roomId).requireSuccess() }
-                .onSuccess { onLeft() }
+                .onSuccess {
+                    closeSocketAfterLeave()
+                    onLeft()
+                }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(leaving = false)
                     messageCenter.show(error.userMessage())
@@ -199,6 +203,7 @@ class RoomDetailViewModel(
                     }
 
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                        if (closingByUser) return
                         if (response?.code == 401) {
                             handleSocketUnauthorized()
                         } else {
@@ -207,6 +212,7 @@ class RoomDetailViewModel(
                     }
 
                     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                        if (closingByUser) return
                         handleSocketDisconnected()
                     }
                 },
@@ -301,7 +307,14 @@ class RoomDetailViewModel(
         _uiState.value = _uiState.value.copy(disconnected = true)
     }
 
+    private fun closeSocketAfterLeave() {
+        closingByUser = true
+        webSocket?.close(1000, "left room")
+        webSocket = null
+    }
+
     override fun onCleared() {
+        closingByUser = true
         webSocket?.close(1000, "view model cleared")
         webSocket = null
         super.onCleared()
