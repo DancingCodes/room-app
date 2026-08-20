@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.flow.collect
 import love.moonc.room.core.network.SessionExpiredCenter
 import androidx.compose.ui.Alignment
@@ -26,9 +27,37 @@ import love.moonc.room.ui.message.CenterMessageHost
 import love.moonc.room.ui.profile.EditProfileScreen
 import love.moonc.room.ui.room.CreateRoomScreen
 import love.moonc.room.ui.room.RoomDetailScreen
+import love.moonc.room.ui.update.ForceUpdateScreen
+import love.moonc.room.ui.update.UpdateViewModel
+import love.moonc.room.ui.update.launchPackageInstaller
 
 @Composable
 fun RoomApp(
+    appContainer: AppContainer,
+    navController: NavHostController = rememberNavController(),
+    updateViewModel: UpdateViewModel = roomViewModel(appContainer),
+) {
+    val updateState by updateViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    if (!updateState.canEnterApp) {
+        ForceUpdateScreen(
+            state = updateState,
+            onRetryCheck = updateViewModel::checkForUpdate,
+            onDownload = updateViewModel::download,
+            onInstall = { apkFile -> launchPackageInstaller(context, apkFile) },
+        )
+        return
+    }
+
+    RoomContent(
+        appContainer = appContainer,
+        navController = navController,
+    )
+}
+
+@Composable
+private fun RoomContent(
     appContainer: AppContainer,
     navController: NavHostController = rememberNavController(),
     appViewModel: AppViewModel = roomViewModel(appContainer),

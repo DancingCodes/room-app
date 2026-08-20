@@ -1,6 +1,7 @@
 package love.moonc.room.data.api
 
 import love.moonc.room.data.model.ApiResponse
+import love.moonc.room.data.model.AppVersion
 import love.moonc.room.data.model.AuthResult
 import love.moonc.room.data.model.CreateMessageRequest
 import love.moonc.room.data.model.CreateRoomRequest
@@ -26,6 +27,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RoomApi {
+    @GET("api/v1/app-version/latest")
+    suspend fun latestAppVersion(): ApiResponse<AppVersion>
+
     @POST("api/v1/auth/email-code")
     suspend fun sendEmailLoginCode(@Body body: EmailCodeRequest): ApiResponse<Unit>
 

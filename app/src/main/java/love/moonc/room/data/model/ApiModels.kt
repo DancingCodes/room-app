@@ -21,6 +21,18 @@ data class UploadImagePayload(
     val url: String,
 )
 @Serializable
+data class AppVersion(
+    @SerialName("version_code")
+    val versionCode: Long,
+    @SerialName("apk_url")
+    val apkUrl: String,
+    @SerialName("apk_sha256")
+    val apkSha256: String,
+    @SerialName("release_notes")
+    val releaseNotes: String,
+)
+
+@Serializable
 data class UserPayload(
     val user: User,
 )

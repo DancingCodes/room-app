@@ -1,4 +1,4 @@
-﻿package love.moonc.room.ui.app
+package love.moonc.room.ui.app
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
@@ -10,6 +10,7 @@ import love.moonc.room.ui.main.HomeViewModel
 import love.moonc.room.ui.profile.ProfileViewModel
 import love.moonc.room.ui.room.CreateRoomViewModel
 import love.moonc.room.ui.room.RoomDetailViewModel
+import love.moonc.room.ui.update.UpdateViewModel
 
 @Composable
 inline fun <reified VM : ViewModel> roomViewModel(appContainer: AppContainer): VM {
@@ -22,6 +23,7 @@ class RoomViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
+            UpdateViewModel::class.java -> UpdateViewModel(appContainer.roomApi, appContainer.apkDownloader)
             AppViewModel::class.java -> AppViewModel(appContainer.roomApi, appContainer.tokenStore)
             AuthViewModel::class.java -> AuthViewModel(appContainer.roomApi, appContainer.tokenStore, appContainer.messageCenter)
             HomeViewModel::class.java -> HomeViewModel(appContainer.roomApi, appContainer.messageCenter)

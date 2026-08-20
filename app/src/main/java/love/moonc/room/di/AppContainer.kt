@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import love.moonc.room.core.network.NetworkConfig
+import love.moonc.room.core.update.ApkDownloader
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.storage.TokenStore
 import love.moonc.room.data.websocket.RoomSocketFactory
@@ -47,6 +48,8 @@ class AppContainer(context: Context) {
             }
         }
         .build()
+
+    val apkDownloader: ApkDownloader = ApkDownloader(okHttpClient, context.applicationContext.cacheDir)
 
     val roomApi: RoomApi = Retrofit.Builder()
         .baseUrl(NetworkConfig.BACKEND_BASE_URL)
