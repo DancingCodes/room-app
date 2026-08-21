@@ -117,13 +117,15 @@ class RoomDetailViewModel(
         viewModelScope.launch {
             runCatching { api.rtcToken(roomId).requireData().token }
                 .onSuccess { token ->
-                    runCatching {
-                        voiceClient.join(roomId, currentUserId, token) {
+                    voiceClient.join(
+                        roomId = roomId,
+                        userId = currentUserId,
+                        token = token,
+                        onTokenRefreshRequired = {
                             refreshVoiceToken(roomId)
-                        }
-                    }.onFailure {
-                        messageCenter.show("语音连接失败")
-                    }
+                        },
+                        onFailure = { messageCenter.show("语音连接失败") },
+                    )
                 }
                 .onFailure {
                     messageCenter.show("语音连接失败")
