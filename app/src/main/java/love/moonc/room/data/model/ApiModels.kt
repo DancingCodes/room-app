@@ -26,8 +26,6 @@ data class AppVersion(
     val versionCode: Long,
     @SerialName("apk_url")
     val apkUrl: String,
-    @SerialName("apk_sha256")
-    val apkSha256: String,
     @SerialName("release_notes")
     val releaseNotes: String,
 )

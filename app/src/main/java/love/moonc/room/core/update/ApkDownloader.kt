@@ -8,7 +8,6 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.security.MessageDigest
 
 class ApkDownloader(
     private val okHttpClient: OkHttpClient,
@@ -30,7 +29,6 @@ class ApkDownloader(
                 }
                 val body = response.body
                 val totalBytes = body.contentLength()
-                val digest = MessageDigest.getInstance("SHA-256")
                 var downloadedBytes = 0L
 
                 body.byteStream().use { input ->
@@ -40,7 +38,6 @@ class ApkDownloader(
                             val count = input.read(buffer)
                             if (count < 0) break
                             output.write(buffer, 0, count)
-                            digest.update(buffer, 0, count)
                             downloadedBytes += count
                             onProgress(downloadedBytes, totalBytes)
                         }
@@ -48,10 +45,7 @@ class ApkDownloader(
                     }
                 }
 
-                val actualHash = digest.digest().joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) }
-                if (!MessageDigest.isEqual(actualHash.toByteArray(), version.apkSha256.lowercase().toByteArray())) {
-                    throw IOException("安装包校验失败")
-                }
+
                 if (!temporaryFile.renameTo(apkFile)) {
                     throw IOException("保存安装包失败")
                 }
@@ -66,10 +60,5 @@ class ApkDownloader(
 
     private fun validate(version: AppVersion) {
         require(version.apkUrl.startsWith("https://")) { "安装包地址错误" }
-        require(sha256Pattern.matches(version.apkSha256)) { "安装包校验值错误" }
-    }
-
-    private companion object {
-        val sha256Pattern = Regex("[0-9a-fA-F]{64}")
     }
 }

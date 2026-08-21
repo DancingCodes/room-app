@@ -63,7 +63,7 @@ fun ForceUpdateScreen(
                 Text(downloadText(state.downloadedBytes, state.totalBytes))
             }
             apkPath != null -> {
-                Text("安装包已下载并校验完成")
+                Text("安装包已下载完成")
                 PrimaryButton(
                     text = "安装更新",
                     loading = false,
