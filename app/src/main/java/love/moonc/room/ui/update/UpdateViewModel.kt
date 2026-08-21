@@ -19,10 +19,8 @@ data class UpdateUiState(
     val totalBytes: Long = -1,
     val apkPath: String? = null,
     val error: String? = null,
-) {
-    val canEnterApp: Boolean
-        get() = !checking && update == null && error == null
-}
+)
+
 
 class UpdateViewModel(
     private val api: RoomApi,
