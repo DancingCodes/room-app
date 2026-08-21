@@ -12,7 +12,7 @@ okhttp = "5.4.0"
 kotlinxSerializationJson = "1.11.0"
 retrofitKotlinxSerialization = "1.0.0"
 coil = "2.7.0"
-agoraRtc = "4.6.2"
+agoraRtc = "4.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
