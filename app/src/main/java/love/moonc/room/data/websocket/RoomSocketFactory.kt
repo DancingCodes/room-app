@@ -28,6 +28,6 @@ class RoomSocketFactory(
             base.startsWith("http://") -> "ws://" + base.removePrefix("http://")
             else -> base
         }
-        return "$wsBase/api/v1/ws/rooms/$roomId"
+        return "$wsBase/api/v1/app/ws/rooms/$roomId"
     }
 }

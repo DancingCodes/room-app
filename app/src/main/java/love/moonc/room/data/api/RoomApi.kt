@@ -28,59 +28,59 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RoomApi {
-    @GET("api/v1/app-version/latest")
+    @GET("api/v1/app/version/latest")
     suspend fun latestAppVersion(): ApiResponse<AppVersion>
 
-    @POST("api/v1/auth/email-code")
+    @POST("api/v1/app/auth/email-code")
     suspend fun sendEmailLoginCode(@Body body: EmailCodeRequest): ApiResponse<Unit>
 
-    @POST("api/v1/auth/email-login")
+    @POST("api/v1/app/auth/email-login")
     suspend fun emailLogin(@Body body: EmailLoginRequest): ApiResponse<AuthResult>
 
-    @GET("api/v1/users/me")
+    @GET("api/v1/app/users/me")
     suspend fun me(): ApiResponse<UserPayload>
 
-    @PATCH("api/v1/users/me")
+    @PATCH("api/v1/app/users/me")
     suspend fun updateMe(@Body body: UpdateMeRequest): ApiResponse<UserPayload>
 
     @Multipart
-    @POST("api/v1/uploads/image")
+    @POST("api/v1/app/uploads/image")
     suspend fun uploadImage(@Part file: MultipartBody.Part): ApiResponse<UploadImagePayload>
 
-    @GET("api/v1/rooms")
+    @GET("api/v1/app/rooms")
     suspend fun rooms(
         @Query("page") page: Int = 1,
         @Query("page_size") pageSize: Int = 20,
     ): ApiResponse<RoomListPayload>
 
-    @POST("api/v1/rooms")
+    @POST("api/v1/app/rooms")
     suspend fun createRoom(@Body body: CreateRoomRequest): ApiResponse<RoomDetail>
 
-    @GET("api/v1/rooms/{room_id}")
+    @GET("api/v1/app/rooms/{room_id}")
     suspend fun roomDetail(@Path("room_id") roomId: Long): ApiResponse<RoomDetail>
 
-    @GET("api/v1/rooms/{room_id}/rtc-token")
+    @GET("api/v1/app/rooms/{room_id}/rtc-token")
     suspend fun rtcToken(@Path("room_id") roomId: Long): ApiResponse<RtcTokenPayload>
-    @POST("api/v1/rooms/{room_id}/join")
+    @POST("api/v1/app/rooms/{room_id}/join")
     suspend fun joinRoom(@Path("room_id") roomId: Long): ApiResponse<RoomDetail>
 
-    @POST("api/v1/rooms/{room_id}/leave")
+    @POST("api/v1/app/rooms/{room_id}/leave")
     suspend fun leaveRoom(@Path("room_id") roomId: Long): ApiResponse<Unit>
 
-    @PATCH("api/v1/rooms/{room_id}/mic")
+    @PATCH("api/v1/app/rooms/{room_id}/mic")
     suspend fun updateMic(
         @Path("room_id") roomId: Long,
         @Body body: UpdateMicRequest,
     ): ApiResponse<MemberPayload>
 
-    @GET("api/v1/rooms/{room_id}/messages")
+    @GET("api/v1/app/rooms/{room_id}/messages")
     suspend fun messages(
         @Path("room_id") roomId: Long,
         @Query("limit") limit: Int = 20,
         @Query("before_id") beforeId: Long? = null,
     ): ApiResponse<MessageListPayload>
 
-    @POST("api/v1/rooms/{room_id}/messages")
+    @POST("api/v1/app/rooms/{room_id}/messages")
     suspend fun createMessage(
         @Path("room_id") roomId: Long,
         @Body body: CreateMessageRequest,
