@@ -46,7 +46,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Room",
+            text = "星闪",
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
         )
