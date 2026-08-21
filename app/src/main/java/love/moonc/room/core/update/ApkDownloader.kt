@@ -45,7 +45,6 @@ class ApkDownloader(
                     }
                 }
 
-
                 if (!temporaryFile.renameTo(apkFile)) {
                     throw IOException("保存安装包失败")
                 }
