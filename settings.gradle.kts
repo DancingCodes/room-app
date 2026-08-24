@@ -5,6 +5,5 @@ pluginManagement {
         gradlePluginPortal() // Kotlin 等其他 Gradle 插件的下载地址。
     }
 }
-
 // 将 app/ 目录作为 Android 应用模块加入构建；没有这一行，Gradle 不会构建 APK。
 include(":app")
