@@ -1,42 +1,76 @@
 [versions]
+# Android Gradle Plugin：把 app 模块构建为 Android 应用；删除后无法构建 APK。
 agp = "9.3.1"
-coreKtx = "1.19.0"
-lifecycleRuntimeKtx = "2.11.0"
+# Kotlin：编译全部 Kotlin 代码，并驱动 Compose、序列化插件；删除后 Kotlin 插件无法解析。
+kotlin = "2.4.10"
+
+# AndroidX Core：提供 FileProvider、ContextCompat 等基础 Android API；删除后相关代码无法编译。
+core = "1.19.0"
+# Activity Compose：让 Activity 能承载 Compose 页面；删除后 MainActivity 无法调用 setContent。
 activityCompose = "1.13.0"
-kotlin = "2.4.0"
-composeBom = "2026.06.00"
+# Lifecycle：提供 ViewModel 及其 Compose 集成；删除后页面状态管理无法编译。
+lifecycle = "2.11.0"
+
+# Compose BOM：统一 Compose UI 库版本；删除后无单独版本号的 Compose 依赖无法解析。
+composeBom = "2026.08.00"
+
+# Navigation Compose：页面路由与返回栈；删除后无法在页面间导航。
 navigationCompose = "2.9.8"
+# DataStore：持久化登录 Token；删除后无法保存登录状态。
 datastore = "1.2.1"
+# Retrofit：声明并调用 HTTP 接口；删除后无法访问后端 API。
 retrofit = "3.0.0"
-okhttp = "5.4.0"
+# OkHttp：执行 HTTP 下载与 WebSocket 连接；删除后网络、更新和实时消息无法工作。
+okhttp = "5.5.0"
+# Kotlinx Serialization JSON：序列化接口和 WebSocket 数据；删除后 JSON 模型无法编译。
 kotlinxSerializationJson = "1.11.0"
+# Retrofit Serialization Converter：让 Retrofit 使用 Kotlinx Serialization；删除后 API 响应无法解析。
 retrofitKotlinxSerialization = "1.0.0"
+# Coil：加载用户和成员头像；删除后远程图片无法显示。
 coil = "2.7.0"
+# Agora RTC：加入语音频道与控制麦克风；删除后房间语音无法工作。
 agoraRtc = "4.6.3"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+# Android 基础 API：提供 FileProvider、ContextCompat；删除后更新安装和权限代码无法编译。
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
+# Compose Activity：让 MainActivity 使用 setContent 渲染 Compose；删除后应用入口无法编译。
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+# Compose 版本清单：统一下方 Compose 库版本；删除后 Compose 库无法解析。
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+# Compose 基础 UI：提供 Composable、布局和修饰器；删除后所有页面无法编译。
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+# Compose 图形：提供 Color 等图形 API；删除后主题颜色无法编译。
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+# Material 3：提供按钮、输入框、卡片和主题；删除后界面组件无法编译。
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+# 扩展图标：提供首页、用户、麦克风等图标；删除后图标引用无法编译。
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+# Compose 导航：提供 NavHost、路由和页面跳转；删除后应用导航无法编译。
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+# ViewModel Compose：在 Compose 中创建并保存 ViewModel；删除后页面状态管理无法编译。
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+# DataStore Preferences：保存 Token 等轻量键值数据；删除后登录状态无法持久化。
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+# Retrofit：定义并调用后端 HTTP 接口；删除后 API 客户端无法编译。
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+# OkHttp：提供 HTTP 客户端、文件下载和 WebSocket；删除后网络模块无法编译。
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+# OkHttp 日志：仅 Debug 构建输出网络请求日志；删除后不影响功能，但排查网络问题会更困难。
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+# JSON 序列化：将 Kotlin 数据类与 JSON 相互转换；删除后接口模型无法编译。
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+# Retrofit JSON 转换器：把接口响应交给 Kotlinx Serialization 解析；删除后 Retrofit 无法读取 JSON 响应。
 retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerialization" }
+# Coil Compose：在 Compose 中显示网络与本地头像；删除后头像加载代码无法编译。
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+# Agora RTC：提供房间实时语音能力；删除后语音模块无法编译。
 agora-rtc = { group = "io.agora.rtc", name = "full-rtc-basic", version.ref = "agoraRtc" }
 
 [plugins]
+# Android 应用插件：生成 APK 并识别 android {} 配置；删除后 app 模块无法构建。
 android-application = { id = "com.android.application", version.ref = "agp" }
+# Compose 编译插件：编译 @Composable 函数；删除后 Compose 页面无法编译。
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+# Kotlin 序列化插件：生成 @Serializable 数据类的序列化代码；删除后接口模型无法编译。
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
