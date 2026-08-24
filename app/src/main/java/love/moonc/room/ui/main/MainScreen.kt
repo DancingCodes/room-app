@@ -1,5 +1,7 @@
 package love.moonc.room.ui.main
 
+// 承载首页和“我的”两个 Tab 的界面；删除后登录后的主操作入口将不可用。
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

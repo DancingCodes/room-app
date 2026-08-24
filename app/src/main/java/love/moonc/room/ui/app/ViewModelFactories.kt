@@ -1,5 +1,7 @@
 package love.moonc.room.ui.app
 
+// 将应用级依赖按 ViewModel 类型传入，保证页面重建时仍使用同一套服务；删除后 Compose 无法创建这些 ViewModel。
+
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -1,5 +1,7 @@
 package love.moonc.room.ui.profile
 
+// 处理昵称和头像更新；删除后用户无法保存个人资料，头像也无法组装为上传请求。
+
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel

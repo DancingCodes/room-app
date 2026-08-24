@@ -1,5 +1,7 @@
 package love.moonc.room.ui.theme
 
+// 定义应用主题使用的基础颜色；删除后主题无法生成固定的深浅色配色。
+
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)

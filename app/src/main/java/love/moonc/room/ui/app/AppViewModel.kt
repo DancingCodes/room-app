@@ -1,5 +1,7 @@
 package love.moonc.room.ui.app
 
+// 管理登录会话和根导航目标；删除后应用无法在启动时恢复登录状态或决定进入哪个主页面。
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow

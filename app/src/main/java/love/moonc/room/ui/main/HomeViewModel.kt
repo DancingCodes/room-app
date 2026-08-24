@@ -1,4 +1,6 @@
-﻿package love.moonc.room.ui.main
+package love.moonc.room.ui.main
+
+// 维护首页房间列表、分页和入房操作；删除后首页无法加载或进入房间。
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

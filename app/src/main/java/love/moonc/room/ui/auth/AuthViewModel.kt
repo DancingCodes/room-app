@@ -1,5 +1,7 @@
 package love.moonc.room.ui.auth
 
+// 处理邮箱验证码、登录和令牌保存；删除后登录页只能展示输入框，无法完成登录。
+
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

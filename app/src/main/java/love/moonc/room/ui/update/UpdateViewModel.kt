@@ -1,5 +1,7 @@
 package love.moonc.room.ui.update
 
+// 检查、下载强制更新安装包并维护进度；删除后应用无法在进入业务前阻止旧版本继续使用。
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow

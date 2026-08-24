@@ -9,10 +9,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+// 下载强制更新 APK 到缓存目录；放在页面层会使下载、清理和文件完整性处理分散。
 class ApkDownloader(
     private val okHttpClient: OkHttpClient,
     private val cacheDir: File,
 ) {
+    // 使用临时文件写入并同步到磁盘，下载完成后再改名；删除这一步可能让安装器拿到不完整 APK。
     suspend fun download(version: AppVersion, onProgress: (Long, Long) -> Unit): File = withContext(Dispatchers.IO) {
         validate(version)
 
@@ -57,6 +59,7 @@ class ApkDownloader(
         }
     }
 
+    // 仅接受 HTTPS 更新地址；删除后可能通过不安全连接下载可安装的 APK。
     private fun validate(version: AppVersion) {
         require(version.apkUrl.startsWith("https://")) { "安装包地址错误" }
     }

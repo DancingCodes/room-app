@@ -1,5 +1,7 @@
 package love.moonc.room.ui.app
 
+// 连接更新检查、登录状态和页面导航，是整个 Compose 界面的入口；删除后应用没有可展示的页面结构。
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator

@@ -1,5 +1,7 @@
 package love.moonc.room.ui.room
 
+// 管理创建房间与房间详情的网络、实时消息和语音状态；删除后房间的核心交互无法运行。
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers

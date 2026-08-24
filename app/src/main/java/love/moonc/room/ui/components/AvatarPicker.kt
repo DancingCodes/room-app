@@ -1,5 +1,7 @@
 package love.moonc.room.ui.components
 
+// 封装头像选择和预览，供资料编辑页复用；删除后用户无法从系统图库选择头像。
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest

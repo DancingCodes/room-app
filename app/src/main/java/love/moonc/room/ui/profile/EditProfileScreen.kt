@@ -1,5 +1,7 @@
 package love.moonc.room.ui.profile
 
+// 展示资料编辑表单并协调保存后的返回；删除后“我的”页面无法编辑资料。
+
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Spacer

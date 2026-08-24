@@ -1,5 +1,7 @@
 package love.moonc.room.ui.auth
 
+// 展示星闪登录界面并把用户操作交给 AuthViewModel；删除后用户没有登录入口。
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

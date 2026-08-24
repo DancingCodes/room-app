@@ -1,5 +1,7 @@
 package love.moonc.room.ui.update
 
+// 显示强制更新状态并发起系统安装流程；删除后检测到新版本时用户无法完成更新。
+
 import android.content.Context
 import android.content.Intent
 import android.net.Uri

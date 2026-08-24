@@ -1,5 +1,7 @@
 package love.moonc.room.ui.message
 
+// 在非界面代码与页面之间传递短提示；删除后网络失败等反馈无法统一显示给用户。
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

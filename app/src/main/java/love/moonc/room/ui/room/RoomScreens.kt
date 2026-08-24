@@ -1,5 +1,7 @@
 package love.moonc.room.ui.room
 
+// 展示创建房间和房间内成员、消息、麦克风操作；删除后房间功能没有用户界面。
+
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler

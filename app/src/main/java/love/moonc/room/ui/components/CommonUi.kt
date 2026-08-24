@@ -1,5 +1,7 @@
 package love.moonc.room.ui.components
 
+// 提供页面统一的间距、表单和按钮，避免各页面重复实现；删除后多个页面的基础布局会失效。
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
