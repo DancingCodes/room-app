@@ -13,6 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.flow.collect
 import love.moonc.room.core.network.SessionExpiredCenter
@@ -76,24 +79,8 @@ private fun RoomContent(
     homeViewModel: HomeViewModel = roomViewModel(appContainer),
 ) {
     val appState by appViewModel.uiState.collectAsState()
-
-    fun navigateMainTab(route: String) {
-        navController.navigate(route) {
-            popUpTo(Routes.Home) {
-                saveState = true
-            }
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
-
-    fun navigateHomeTab() {
-        navigateMainTab(Routes.Home)
-    }
-
-    fun navigateMeTab() {
-        navigateMainTab(Routes.Me)
-    }
+    var selectedTabName by rememberSaveable { mutableStateOf(MainTab.Home.name) }
+    val selectedTab = MainTab.valueOf(selectedTabName)
 
 
     LaunchedEffect(appState.user?.id) {
@@ -136,29 +123,19 @@ private fun RoomContent(
                     onLoginSuccess = { user -> appViewModel.setUser(user) },
                 )
             }
-            composable(Routes.Home) {
+            composable(Routes.Main) {
                 MainScreen(
-                    selectedTab = MainTab.Home,
+                    selectedTab = selectedTab,
                     user = appState.user,
                     homeViewModel = homeViewModel,
-                    onHomeTab = ::navigateHomeTab,
-                    onMeTab = ::navigateMeTab,
+                    onHomeTab = { selectedTabName = MainTab.Home.name },
+                    onMeTab = { selectedTabName = MainTab.Me.name },
                     onCreateRoom = { navController.navigate(Routes.CreateRoom) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
-                    onEditProfile = { navController.navigate(Routes.EditProfile) },
-                    onLogout = { appViewModel.logout() },
-                )
-            }
-            composable(Routes.Me) {
-                MainScreen(
-                    selectedTab = MainTab.Me,
-                    user = appState.user,
-                    homeViewModel = homeViewModel,
-                    onHomeTab = ::navigateHomeTab,
-                    onMeTab = ::navigateMeTab,
-                    onCreateRoom = { navController.navigate(Routes.CreateRoom) },
-                    onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
-                    onEditProfile = { navController.navigate(Routes.EditProfile) },
+                    onEditProfile = {
+                        selectedTabName = MainTab.Me.name
+                        navController.navigate(Routes.EditProfile)
+                    },
                     onLogout = { appViewModel.logout() },
                 )
             }
@@ -194,7 +171,8 @@ private fun RoomContent(
                     onLeft = { message ->
                         appContainer.messageCenter.show(message)
                         homeViewModel.refresh()
-                        navController.navigate(Routes.Home) { popUpTo(0) }
+                        selectedTabName = MainTab.Home.name
+                        navController.navigate(Routes.Main) { popUpTo(0) }
                     },
                     onUnauthorized = {
                         appContainer.messageCenter.show("登录已过期，请重新登录")

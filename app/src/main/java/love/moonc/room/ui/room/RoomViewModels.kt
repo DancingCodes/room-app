@@ -84,6 +84,10 @@ class RoomDetailViewModel(
     private val voiceClient: AgoraVoiceClient,
     private val messageCenter: MessageCenter,
 ) : ViewModel() {
+    companion object {
+        const val MAX_MESSAGE_LENGTH = 50
+    }
+
     private val _uiState = MutableStateFlow(RoomDetailUiState())
     val uiState: StateFlow<RoomDetailUiState> = _uiState
     private val json = Json { ignoreUnknownKeys = true }
@@ -141,12 +145,15 @@ class RoomDetailViewModel(
         }
     }
     fun updateInput(value: String) {
-        _uiState.value = _uiState.value.copy(input = value)
+        _uiState.value = _uiState.value.copy(input = value.take(MAX_MESSAGE_LENGTH))
     }
 
     fun sendMessage(roomId: Long) {
         val content = _uiState.value.input.trim()
-        if (content.isEmpty()) return
+        if (content.length !in 1..MAX_MESSAGE_LENGTH) {
+            messageCenter.show("消息需为1-50个字符")
+            return
+        }
 
         viewModelScope.launch {
             runCatching { api.createMessage(roomId, CreateMessageRequest(content)).requireData() }

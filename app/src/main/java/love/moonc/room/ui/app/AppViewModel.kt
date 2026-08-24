@@ -78,6 +78,6 @@ class AppViewModel(
 
     private fun routeForUser(user: User): String {
         val roomId = user.currentRoomId
-        return if (roomId == null) Routes.Home else Routes.roomDetail(roomId)
+        return if (roomId == null) Routes.Main else Routes.roomDetail(roomId)
     }
 }

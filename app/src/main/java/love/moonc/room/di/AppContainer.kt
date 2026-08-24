@@ -5,6 +5,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import love.moonc.room.BuildConfig
 import love.moonc.room.core.network.NetworkConfig
 import love.moonc.room.core.update.ApkDownloader
 import love.moonc.room.core.voice.AgoraVoiceClient
@@ -41,7 +42,7 @@ class AppContainer(context: Context) {
             chain.proceed(request)
         }
         .apply {
-            if (NetworkConfig.ENABLE_HTTP_LOGGING) {
+            if (BuildConfig.DEBUG) {
                 addInterceptor(
                     HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY

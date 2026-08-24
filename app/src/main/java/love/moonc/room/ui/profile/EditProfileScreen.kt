@@ -52,7 +52,11 @@ fun EditProfileScreen(
             uploading = state.loading,
             onAvatarSelected = { uri -> avatarUri = uri },
         )
-        FormTextField(nickname, { nickname = it }, "昵称")
+        FormTextField(
+            value = nickname,
+            onValueChange = { nickname = it.take(ProfileViewModel.MAX_NICKNAME_LENGTH) },
+            label = "昵称",
+        )
         Spacer(Modifier.weight(1f))
         PrimaryButton(
             text = "保存",

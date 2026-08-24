@@ -23,6 +23,10 @@ class ProfileViewModel(
     private val api: RoomApi,
     private val messageCenter: MessageCenter,
 ) : ViewModel() {
+    companion object {
+        const val MAX_NICKNAME_LENGTH = 8
+    }
+
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
@@ -34,6 +38,11 @@ class ProfileViewModel(
         onSaved: (User) -> Unit,
     ) {
         if (_uiState.value.loading) return
+        val trimmedNickname = nickname.trim()
+        if (trimmedNickname.length !in 1..MAX_NICKNAME_LENGTH) {
+            messageCenter.show("昵称需为1-8个字符")
+            return
+        }
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
@@ -41,7 +50,7 @@ class ProfileViewModel(
                 val avatarUrl = avatarUri?.let { uri ->
                     api.uploadImage(uri.toImagePart(context)).requireData().url
                 } ?: currentAvatarUrl
-                api.updateMe(UpdateMeRequest(nickname.trim(), avatarUrl)).requireData().user
+                api.updateMe(UpdateMeRequest(trimmedNickname, avatarUrl)).requireData().user
             }.onSuccess { user ->
                 _uiState.value = ProfileUiState()
                 onSaved(user)

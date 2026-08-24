@@ -3,8 +3,7 @@
 object Routes {
     const val Splash = "splash"
     const val Login = "login"
-    const val Home = "main/home"
-    const val Me = "main/me"
+    const val Main = "main"
     const val EditProfile = "profile/edit"
     const val CreateRoom = "rooms/create"
     const val RoomDetail = "rooms/{roomId}"
