@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- 访问后端 HTTP、WebSocket 和更新安装包；删除后所有网络功能无法使用。 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 用户开麦时请求录音权限；删除后无法采集本地语音。 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 声网控制扬声器和本地音频；删除后房间语音设备控制可能失效。 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- 调起系统安装器安装强制更新 APK；删除后无法安装下载的更新包。 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:ignore="RequestInstallPackagesPolicy" />
 
+    <!-- 初始化应用级依赖、主题和启动图标；删除 Application 声明后 RoomApplication 不会创建。 -->
     <application
         android:name=".RoomApplication"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Roomapp">
+        android:theme="@style/Theme.RoomApp">
+        <!-- 应用启动入口；删除启动 Intent Filter 后图标不会出现在系统启动器。
+             键盘弹出时保持 Compose 布局尺寸，由页面自行处理可见区域。 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Roomapp"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,6 +32,7 @@
             </intent-filter>
         </activity>
 
+        <!-- 仅向系统安装器授予缓存 APK 的临时读取权限；删除后无法安装应用内下载的更新包。 -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
