@@ -7,13 +7,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import love.moonc.room.core.file.toImagePart
 import love.moonc.room.core.network.requireData
 import love.moonc.room.core.network.userMessage
 import love.moonc.room.data.api.RoomApi
 import love.moonc.room.data.model.UpdateMeRequest
 import love.moonc.room.data.model.User
 import love.moonc.room.ui.message.MessageCenter
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 data class ProfileUiState(
     val loading: Boolean = false,
@@ -60,4 +62,11 @@ class ProfileViewModel(
             }
         }
     }
+}
+
+private fun Uri.toImagePart(context: Context): MultipartBody.Part {
+    val mimeType = context.contentResolver.getType(this) ?: "application/octet-stream"
+    val bytes = context.contentResolver.openInputStream(this)?.use { it.readBytes() }
+        ?: throw IllegalArgumentException("无法读取头像文件")
+    return MultipartBody.Part.createFormData("file", "image", bytes.toRequestBody(mimeType.toMediaType()))
 }
