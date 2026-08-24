@@ -35,7 +35,7 @@ class AppViewModel(
         viewModelScope.launch {
             val token = tokenStore.token.firstOrNull()
             if (token.isNullOrBlank()) {
-                _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.Login)
+                _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.LOGIN)
                 return@launch
             }
 
@@ -43,7 +43,7 @@ class AppViewModel(
                 .onSuccess { user -> setUser(user) }
                 .onFailure {
                     tokenStore.clearToken()
-                    _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.Login)
+                    _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.LOGIN)
                 }
         }
     }
@@ -74,12 +74,12 @@ class AppViewModel(
     fun logout() {
         viewModelScope.launch {
             tokenStore.clearToken()
-            _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.Login)
+            _uiState.value = AppUiState(isChecking = false, targetRoute = Routes.LOGIN)
         }
     }
 
     private fun routeForUser(user: User): String {
         val roomId = user.currentRoomId
-        return if (roomId == null) Routes.Main else Routes.roomDetail(roomId)
+        return if (roomId == null) Routes.MAIN else Routes.roomDetail(roomId)
     }
 }

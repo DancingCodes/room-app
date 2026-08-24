@@ -107,34 +107,34 @@ private fun RoomContent(
     Box(Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
-            startDestination = Routes.Splash,
+            startDestination = Routes.SPLASH,
         ) {
-            composable(Routes.Splash) {
+            composable(Routes.SPLASH) {
                 SplashScreen()
             }
-            composable(Routes.Login) {
+            composable(Routes.LOGIN) {
                 LoginScreen(
                     appContainer = appContainer,
                     onLoginSuccess = { user -> appViewModel.setUser(user) },
                 )
             }
-            composable(Routes.Main) {
+            composable(Routes.MAIN) {
                 MainScreen(
                     selectedTab = selectedTab,
                     user = appState.user,
                     homeViewModel = homeViewModel,
                     onHomeTab = { selectedTabName = MainTab.Home.name },
                     onMeTab = { selectedTabName = MainTab.Me.name },
-                    onCreateRoom = { navController.navigate(Routes.CreateRoom) },
+                    onCreateRoom = { navController.navigate(Routes.CREATE_ROOM) },
                     onRoomClick = { roomId -> navController.navigate(Routes.roomDetail(roomId)) },
                     onEditProfile = {
                         selectedTabName = MainTab.Me.name
-                        navController.navigate(Routes.EditProfile)
+                        navController.navigate(Routes.EDIT_PROFILE)
                     },
                     onLogout = { appViewModel.logout() },
                 )
             }
-            composable(Routes.EditProfile) {
+            composable(Routes.EDIT_PROFILE) {
                 EditProfileScreen(
                     appContainer = appContainer,
                     user = appState.user,
@@ -145,18 +145,18 @@ private fun RoomContent(
                     onBack = { navController.popBackStack() },
                 )
             }
-            composable(Routes.CreateRoom) {
+            composable(Routes.CREATE_ROOM) {
                 CreateRoomScreen(
                     appContainer = appContainer,
                     onCreated = { roomId ->
                         navController.navigate(Routes.roomDetail(roomId)) {
-                            popUpTo(Routes.CreateRoom) { inclusive = true }
+                            popUpTo(Routes.CREATE_ROOM) { inclusive = true }
                         }
                     },
                 )
             }
             composable(
-                route = Routes.RoomDetail,
+                route = Routes.ROOM_DETAIL,
                 arguments = listOf(navArgument("roomId") { type = NavType.LongType }),
             ) { entry ->
                 val roomId = entry.arguments?.getLong("roomId") ?: return@composable
@@ -167,7 +167,7 @@ private fun RoomContent(
                         appContainer.messageCenter.show(message)
                         homeViewModel.refresh()
                         selectedTabName = MainTab.Home.name
-                        navController.navigate(Routes.Main) { popUpTo(0) }
+                        navController.navigate(Routes.MAIN) { popUpTo(0) }
                     },
                     onUnauthorized = {
                         appContainer.messageCenter.show("登录已过期，请重新登录")
