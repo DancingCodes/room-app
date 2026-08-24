@@ -4,7 +4,7 @@ import love.moonc.room.data.model.ApiResponse
 
 fun <T> ApiResponse<T>.requireData(): T {
     requireSuccessCode()
-    return data ?: throw ApiException(code, message)
+    return data ?: throw ApiException(message)
 }
 
 fun ApiResponse<Unit>.requireSuccess() {
@@ -16,6 +16,6 @@ private fun ApiResponse<*>.requireSuccessCode() {
         SessionExpiredCenter.notifyExpired()
     }
     if (code != 200) {
-        throw ApiException(code, message)
+        throw ApiException(message)
     }
 }

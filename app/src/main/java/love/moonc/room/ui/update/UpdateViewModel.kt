@@ -39,7 +39,7 @@ class UpdateViewModel(
         viewModelScope.launch {
             runCatching {
                 val response = api.latestAppVersion()
-                if (response.code != 200) throw ApiException(response.code, response.message)
+                if (response.code != 200) throw ApiException(response.message)
                 response.data
             }.onSuccess { version ->
                 _uiState.value = UpdateUiState(
